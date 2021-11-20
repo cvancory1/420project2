@@ -1,0 +1,259 @@
+plasm-ph/9607002
+Test Title 1
+Author 1
+  Abstract 1.
+++++++
+plasm-ph/9607001
+Test Title 2
+Author 2
+  Abstract 2. Insert hard computer science topic here.
+++++++
+plasm-ph/9512001
+Test Title 3
+Author 3
+  Abstract 3.
+++++++
+plasm-ph/9512002
+Test Title 4
+Author 4
+  Abstract 4.
++++++
+plasm-ph/9503001
+Test Title 5
+Author 5
+  Abstract 5.
++++++
+plasm-ph/9503002
+Test Title 6
+Author 6
+  Abstract 6.
++++++
+plasm-ph/9604002
+Test Title 7
+Author 7
+  Abstract 7.
++++++
+plasm-ph/9604001
+Test Title 8
+Author 8
+  Abstract 8.
++++++
+plasm-ph/9604003
+Test Title 9
+Author 9
+  Abstract 9.
++++++
+plasm-ph/9507002
+Test Title 10
+Author 10
+  Abstract 10.
++++++
+0704.0001
+Untitled Paper
+Author unknown
+  Testing a paper ID not in the testCitations file.
++++++
+plasm-ph/9507001
+Test Title 11
+Author 11
+  Abstract 11.
++++++
+plasm-ph/9602001
+Test Title 12
+Author 12
+  Abstract 12.
++++++
+plasm-ph/9602003
+Test Title 13
+Author 13
+  Abstract 13.
++++++
+plasm-ph/9602002
+Test Title 14
+Author 14
+  Abstract 14.
++++++
+plasm-ph/9608002
+Test Title 15
+Author 15
+  Abstract 15.
++++++
+plasm-ph/9608001
+Test Title 16
+Author 16
+  Abstract 16.
++++++
+plasm-ph/9609002
+Test Title 17
+Author 17
+  Abstract 17.
++++++
+plasm-ph/9609001
+Test Title 18
+Author 18
+  Abstract 18.
++++++
+plasm-ph/9511002
+Test Title 19
+Author 19
+  Abstract 19.
++++++
+plasm-ph/9511001
+Test Title 20
+Author 20
+  Abstract 20.
++++++
+plasm-ph/9502001
+Test Title 21
+Author 21
+  Abstract 21.
++++++
+plasm-ph/9502002
+Test Title 22
+Author 22
+  Abstract 22.
++++++
+plasm-ph/9502003
+Test Title 23
+Author 23
+  Abstract 23.
++++++
+plasm-ph/9506003
+Test Title 24
+Author 24
+  Abstract 24.
++++++
+plasm-ph/9506004
+Test Title 25
+Author 25
+  Abstract 25.
++++++
+plasm-ph/9506001
+Test Title 26
+Author 26
+  Abstract 26.
++++++
+alg-geom/9211001
+Test Title 27
+Author 27
+  Abstract 27.
++++++
+alg-geom/9209001
+Test Title 28
+Author 28
+  Abstract 28.
++++++
+alg-geom/9412013
+Test Title 29
+Author 29
+  Abstract 29.
++++++
+alg-geom/9412011
+Test Title 30
+Author 30
+  Abstract 30.
++++++
+0704.0002
+Untitled Paper 2
+Author unknown 2
+  Testing a paper ID not in the testCitations file 2.
++++++
+alg-geom/9412002
+Test Title 31
+Author 31
+  Abstract 31.
++++++
+alg-geom/9412007
+Test Title 32
+Author 32
+  Abstract 32.
++++++
+alg-geom/9412010
+Test Title 33
+Author 33
+  Abstract 33.
++++++
+alg-geom/9412020
+Test Title 34
+Author 34
+  Abstract 34.
++++++
+alg-geom/9412012
+Test Title 35
+Author 35
+  Abstract 35.
++++++
+alg-geom/9412009
+Test Title 36
+Author 36
+  Abstract 36.
++++++
+alg-geom/9412022
+Test Title 37
+Author 37
+  Abstract 37.
++++++
+alg-geom/9412005
+Test Title 38
+Author 38
+  Abstract 38.
++++++
+alg-geom/9412017
+Test Title 39
+Author 39
+  Abstract 39.
++++++
+alg-geom/9412018
+Test Title 40
+Author 40
+  Abstract 40.
++++++
+alg-geom/9412016
+Test Title 41
+Author 41
+  Abstract 41.
++++++
+alg-geom/9412014
+Test Title 42
+Author 42
+  Abstract 42.
++++++
+alg-geom/9412001
+Test Title 43
+Author 43
+  Abstract 43.
++++++
+alg-geom/9412003
+Test Title 44
+Author 44
+  Abstract 44.
++++++
+alg-geom/9412004
+Test Title 45
+Author 45
+  Abstract 45.
++++++
+alg-geom/9412008
+Test Title 46
+Author 46
+  Abstract 46.
++++++
+alg-geom/9412019
+Test Title 47
+Author 47
+  Abstract 47.
++++++
+alg-geom/9412006
+Test Title 48
+Author 48
+  Abstract 48.
++++++
+alg-geom/9412021
+Test Title 49
+Author 49
+  Abstract 49.
++++++
+alg-geom/9412015
+Test Title 50
+Author 50
+  Abstract 50.
