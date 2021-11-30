@@ -10,6 +10,11 @@ module2.o: module2.c matrixFunctions.c
 sqltest: sqltest.c
 	gcc -std=c99 sqltest.c -o sqltest -lsqlite3
 
+module1: tree.c 
+	mpicc -std=c99 -g -lm module1.c -o  module1
+
 clean:
-	rm *.o
+	rm -f *.o
 	rm -f time module2 
+	rm -f module1
+
