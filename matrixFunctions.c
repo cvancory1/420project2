@@ -1,19 +1,19 @@
 
 /*
-  Chloe VanCory & Kalyn Howes 
-  COSC 420 
+  Chloe VanCory & Kalyn Howes
+  COSC 420
   11/ 8/2021
   Lab 4 - page rank power method
 
 
-*/ 
+*/
+#include <math.h>
 #include <mpi.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
 #include <unistd.h>
-#include <math.h>
 
 #define ROOT 0
 
@@ -32,14 +32,17 @@ typedef struct Matrix {
   double *data;
 } Matrix;
 
-void initMatrix(Matrix *A, int rows, int cols) {
-  A->rows = rows;
-  A->cols = cols;
-  A->data = malloc(A->rows * A->cols * sizeof(double));
+
+typedef struct AdjacenyList {
+  int globalID;
+  int length;
+  int *data;  // Holds the global index from db that this paper cites
+} AdjacenyList;
+
+
+void everyonePrint(int rank, char *str, int *arr) {
+  printf("Rank =%d %s=%d\n", rank, str, arr[rank]);
 }
-
-
-
 
 // // to error check
 // char *arrbuf = bufArr(recvbufA, sendcts[rank]);
@@ -61,7 +64,6 @@ char *bufArr(double *arr, int n) {
   return buf;
 }
 
-
 // void printARR(int* A) {
 //   for (int i = 0; i < A.rows * A.cols; i++) {
 //     printf("%4d ", A[i]);
@@ -72,19 +74,29 @@ char *bufArr(double *arr, int n) {
 void printMatrix(Matrix A) {
   for (int i = 0; i < A.rows; i++) {
     for (int j = 0; j < A.cols; j++) {
-      printf("%2f ", ACCESS(A, i, j));
+      printf("%2f", ACCESS(A, i, j));
+    }
+    printf("\n"); 
+  }
+}
+
+void printMatrixandRank(Matrix A, int rank) {
+  printf("RANK=%d\n", rank);
+  for (int i = 0; i < A.rows; i++) {
+    for (int j = 0; j < A.cols; j++) {
+      printf("%2f", ACCESS(A, i, j));
     }
     printf("\n");
   }
 }
 
-void printMatrixD(Matrix A) {
-  for (int i = 0; i < A.rows; i++) {
-    for (int j = 0; j < A.cols; j++) {
-      printf("%2f ", ACCESS(A, i, j));
-    }
-    printf("\n");
+void printarray(double * arr , int length){
+  for (int i = 0; i <length; i++) {
+    printf("%f\n", arr[i]);
   }
+    // printf("\n");
+
+
 }
 
 /* To automate this garbage and store the results in a nice struct */
@@ -92,8 +104,6 @@ typedef struct SGData {
   int *cnts;
   int *displs;
 } SGData;
-
-
 
 SGData getSGCounts(int rows, int cols, int worldSize) {
   SGData temp;
@@ -120,161 +130,157 @@ SGData getSGCounts(int rows, int cols, int worldSize) {
   for (int i = 1; i < worldSize; i++) {
     temp.displs[i] = temp.displs[i - 1] + temp.cnts[i - 1];
   }
-
-
   return temp;
 }
 
-
-
-
-
 // tests to see whether the vector is converging to an eigenvalue
-int isConverged(Matrix prevVec, Matrix curretVec){
+int isConverged(Matrix prevVec, Matrix curretVec) {
   double e = 10E-16;
   double temp;
-  double sum =0; 
-  for(int i =0; i< prevVec.rows; i++ ){
+  double sum = 0;
+  for (int i = 0; i < prevVec.rows; i++) {
     temp = prevVec.data[i] - curretVec.data[i];
-    temp = temp*temp;
-    // printf("prevVec= %f cur=%f Difference=%f \n",  prevVec.data[i] ,curretVec.data[i], temp);
+    temp = temp * temp;
+    // printf("prevVec= %f cur=%f Difference=%f \n",  prevVec.data[i]
+    // ,curretVec.data[i], temp);
 
-    sum += temp; 
+    sum += temp;
   }
-  if(sum < e){
-    return 1; // is converged
-  }else{
-    return 0; // not converged
+  if (sum < e) {
+    return 1;  // is converged
+  } else {
+    return 0;  // not converged
   }
-  
 }
-
-
-
-
 
 Matrix matrixMultiplication(Matrix A, Matrix B) {
   Matrix C;
   C.rows = A.rows;
   C.cols = B.cols;
-  C.data = malloc(A.rows*B.cols*sizeof(double));
-  // if(rank =0)printMatrix(A);
-  // if(rank ==0) printMatrix(B);
-  
-  // double sum = 0;
-  // int count=0;
-  // for (int i = 0; i < A.rows; i++) {
-  //   for (int j = 0; j < B.rows; j++) {
-  //     //printf("sum reset\n");
-  //     for (int k = 0; k < A.rows; k++) {
-  //       sum += ACCESS(A, i, j) * ACCESS(B, k, j);
-  //       // printf("current sum: %f ACCESS(A, j, k)=%f ACCESS(B, k, j)=%f\n",ACCESS(A, j, k),  sum,ACCESS(B, k, j));
-  //       printf(" sum: %f A=%f B)=%f\n", sum,ACCESS(A, i, j),  ACCESS(B, k, j));
-  //     }
-     
-     
-  //   }
-  //     C.data[count++] = sum;
-  //     printf("Sum=%f\n",sum);
-  //     sum = 0;
-  // }
+  C.data = malloc(A.rows * B.cols * sizeof(double));
 
   double sum = 0;
-  int count=0;
-  for (int i=0; i<A.rows ;i++) {
-    for(int j=0; j<B.cols; j++){
+  int count = 0;
+  for (int i = 0; i < A.rows; i++) {
+    for (int j = 0; j < B.cols; j++) {
       for (int k = 0; k < A.cols; k++) {
-          sum += A.data[i*A.cols+k] *B.data[j*B.cols+k];
-          // printf("rank=%d A=%d B=%d\n", rank,i, j);
-          // printf("rank=%d A=%f B=%f\n", rank,A.data[i*A.cols+k],B.data[j*B.cols+k]);
+        sum += A.data[i * A.cols + k] * B.data[j * B.cols + k];
+        // printf("rank=%d A=%d B=%d\n", rank,i, j);
+        // printf("rank=%d A=%f B=%f\n",
+        // rank,A.data[i*A.cols+k],B.data[j*B.cols+k]);
       }
-      
-        // printf("\nsum=%f\n",sum);
-        C.data[count++]= sum;
-        sum=0;
+
+      // printf("\nsum=%f\n",sum);
+      C.data[count++] = sum;
+      sum = 0;
     }
   }
 
-  //puts("RESULT:");
-  //printMatrix(C);
+  // MPI_Barrier(world);
+  // puts("RESULT:");
+  // // printf("matrix multiplicatin rank=%d\n", rank);
+  // printMatrix(C);
+  // puts("========");
+
   return C;
 }
+
+
+
 
 // subtracts 2 matrices
 Matrix matrixSubtraction(Matrix A, Matrix B) {
   Matrix d;
   d.rows = A.rows;
   d.cols = A.cols;
-  d.data = malloc(d.rows* d.cols* sizeof(double));
-  for (int i = 0; i < A.cols; i++) { 
-    for (int j = 0; j < A.rows;j++)
-    ACCESS(d,i,j) = ACCESS(A,i,j) - ACCESS(B,i,j);
+  // printf("matrid D row=%d col=%d ", A.rows, A.cols);
+  d.data = malloc(d.rows * d.cols * sizeof(double));
+  for (int i = 0; i < A.cols; i++) {
+    for (int j = 0; j < A.rows; j++)
+      ACCESS(d, i, j) = ACCESS(A, i, j) - ACCESS(B, i, j);
   }
   return d;
 }
 
-double euclidean_norm(Matrix X){
-  double norm = 0; 
-  for(int i =0 ; i < X.rows * X.cols ;i++){
-    // printf("data=%f\n",X.data[i]);
-    norm+= (X.data[i] * X.data[i]);
 
+
+double euclidean_norm(Matrix X) {
+  double norm = 0;
+  for (int i = 0; i < X.rows * X.cols; i++) {
+    // printf("data=%f\n",X.data[i]);
+    norm += (X.data[i] * X.data[i]);
   }
+
   // printf("R=%d norm=%f\n", rank, sqrt(norm));
 
   return sqrt(norm);
 }
 
-Matrix calcNorm( Matrix X){
+
+
+
+Matrix calcNorm(Matrix X) {
   double norm = euclidean_norm(X);
   // printf("R=%d norm=%f\n", rank, norm);
-  // printf(" norm=%f\n",norm);
+  printf(" norm=%f\n",norm);
   Matrix Xcopy;
   Xcopy.rows = X.rows;
   Xcopy.cols = X.cols;
-  Xcopy.data =  malloc(X.rows * X.cols *sizeof(double));
-  for(int i =0; i <X.rows * X.cols; i++ ){
+  Xcopy.data = malloc(X.rows * X.cols * sizeof(double));
+  for (int i = 0; i < X.rows * X.cols; i++) {
     Xcopy.data[i] = X.data[i];
   }
 
-  for (int i =0; i < X.rows * X.cols ; i++){
+  for (int i = 0; i < X.rows * X.cols; i++) {
+    // if(rank==0) printf("R=%d X.data[i]=%f norm=%f result =%f \n", rank,Xcopy.data[i], norm,  Xcopy.data[i]/norm);
     Xcopy.data[i] = Xcopy.data[i] / norm;
-    // if(rank==0) printf("R=%d X.data[i]=%f norm=%f\n", rank,X.data[i], norm);
+    // if(rank==0) printf("R=%d X.data[i]=%f norm=%f result =%f \n", rank,Xcopy.data[i], norm,  Xcopy.data[i]/norm);
   }
 
+  return Xcopy;
+}
 
-  return Xcopy; 
-
-//  for (int i =0; i < X.rows * X.cols ; i++){
-//     X.data[i] = X.data[i] / norm;
-//     if(rank==0) printf("R=%d X.data[i]=%f norm=%f\n", rank,X.data[i], norm);
-//   }
-//   return X;
-
+double calcEigen(Matrix X) { 
+  return euclidean_norm(X); 
 }
 
 
-double calcEigen(Matrix X){
-  return euclidean_norm(X);
-}
-
-double powerMethod(Matrix A, Matrix X, int originalRows,int originalCols , int iterationNum, double e ){
+double powerMethod(Matrix A, Matrix X, int originalRows,int originalCols , int iterationNum, double epsilon ){
   // if(rank ==0) printMatrix(A);
-  // if(rank ==1) printMatrix(A);
+  // if(rank ==0) printMatrix(X);
 
+  // puts("");
+  // if(rank ==1) printMatrix(A);
+// printf("it=%d  e= %1.20f\n",iterationNum, epsilon);
+// printf("it=%d\n",iterationNum);
+
+  // xsub - is a portion of the X vector each proc is in charge of 
   SGData xSub_counts =  getSGCounts(originalRows, originalCols ,worldSize);
   for(int i =0; i< worldSize ;i++){
     xSub_counts.cnts[i] = xSub_counts.cnts[i] / originalRows;
     xSub_counts.displs[i] = xSub_counts.displs[i] / originalRows;
     
   }
+  // everyonePrint(rank, "disls=", xSub_counts.displs);
+  // everyonePrint(rank, "cnts=", xSub_counts.cnts);
+
+
   int count = 0; 
-  double E = 0;
-  while(count < iterationNum || E < e){
+  double E = 0;// tracks the amount of "change" each vector has gone through after every iteration .. used for convegerence
+  while(count < iterationNum || E < epsilon){
+
+  //   // every proc multiplies with their local array A and the entire X 
+    // if(rank == 1){
+    // printMatrix(A);
+    // printMatrix(X);
+    // }
     Matrix Xsub = matrixMultiplication(A, X);
+    // printf("rank=%d xsub------\n", rank);
+    // printMatrix(Xsub);
     // printf("rank=%d counts=%d displs=%d \n", rank, xSub_counts.cnts[rank],xSub_counts.displs[rank]);
     // MPI_Barrier(world);
 
+    /* gather and every proc receives the updated X vector  */ 
     MPI_Allgatherv(
                   Xsub.data,  // sendbuf
                   xSub_counts.cnts[rank], //sendcount
@@ -283,21 +289,19 @@ double powerMethod(Matrix A, Matrix X, int originalRows,int originalCols , int i
                   xSub_counts.cnts, //* recvcounts
                   xSub_counts.displs,// *displs
                   MPI_DOUBLE,world);
-    // char *arrbuf = bufArr( X.data,  X.rows *  X.cols);
-    // printf("Rank %d received %s\n", rank, arrbuf);
+  //  char *arrbuf = bufArr( X.data,  X.rows *  X.cols);
+  //  if(rank ==0 ) printf("count =%d received %s\n", count, arrbuf);
 
-    Matrix diff = matrixSubtraction(Xsub, X);
-    // find largest value in difference matrix
-    double max = 0;
-    for (int i = 0; i < diff.cols; i++) {
-      for (int j = 0; j < diff.rows; j++) {
-        if (ACCESS(diff, i, j) > 0)
-          max = ACCESS(diff, i, j);
-      }
-    }
+    // calc the difference to see if the threshold has been met ( ie no more change .... A converged,  stop the loop)
+  Matrix diff = matrixSubtraction(Xsub, X);
 
-    double E = fabs(max);
+    E = fabs(euclidean_norm(diff));
 
+    //  if(rank ==0 )  printf("LOOP= %d THRESHOLD = %1.15f e=%1.15f \n",count,  E , epsilon  );
+
+
+  MPI_Barrier(world);
+    // if X has converged or we have reached 20 iterations then stop and return the eigen value 
     if(count != iterationNum-1){
       X = calcNorm(X);
       if(rank ==ROOT){
@@ -313,7 +317,261 @@ double powerMethod(Matrix A, Matrix X, int originalRows,int originalCols , int i
 
 
   }
+}
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
+  look at the array of indicies and access the X vector at those 
+  - store the sum maybe create a new array to return as the X vector
+  - then normalize like usual
+
+
+
+  // we are going to scatter the lists when we call
+  // LISTA Is a local copy 
+*/
+
+
+
+// locallistSize = rows in Xsub 
+void newpowermethod(AdjacenyList * listA, Matrix X, int localListSize, int TOTALLISTSIZE, int iterationNum ){
+  printf("ENTER rank =%d localListSize=%d\n", rank, localListSize);
+  if(rank ==0 ) printf("rows=%d cols=%d\n", X.rows, X.cols);
+
+
+  // for every row of the adcaceny list needs to calculate the sum then that gets returned back to 
+  // the main and thn gets reassigned 
+  // so work on x1 , means looking at list1[1]
+
+  SGData xSub_counts =  getSGCounts(TOTALLISTSIZE, 1 ,worldSize);
+  everyonePrint(rank,"dipls=",xSub_counts.displs );
+  everyonePrint(rank,"cnts=",xSub_counts.cnts );
+
+  int count = 0 ; 
+
+  while(count < iterationNum){
+
+    double * xsub = malloc( localListSize * sizeof(double)); 
+    for(int i =0 ; i <localListSize; i++ )xsub[i] =0; 
+  
+  
+    for(int i =0 ; i < localListSize ; i++){
+      // look at the recipe of what x1 equals in the indexes 
+      if(listA[i].length == 0 ){
+        xsub[i] = 0; 
+      }
+
+      for(int j = 0 ; j < listA[i].length; j++){
+        // printf("length=%d listA[%d].data=%d \n",listA[i].length , i , listA[i].data[j] );
+        int xlocation = listA[i].data[j];
+        xsub[i] += X.data[xlocation];
+
+        // printf("rank =%d xlocation=%d adjIndex[%d] =%d X.data[xlocation]=%f xsub=%f\n",rank,  xlocation, i, listA[i].data[j],  X.data[xlocation], xsub[i]);
+      }
+      puts("");
+      // printf("FINAL xsub[%d] =%f\n", i , xsub[i]);
+    }
+
+
+    MPI_Barrier(world);
+    // error checking xsub after its finshed adding 
+    for(int i =0 ; i< localListSize ; i++){
+      // printf("rank=%d  xsub[%d] =%f\n\n",rank, i , xsub[i]);
+
+    }
+
+    MPI_Allgatherv(
+                    xsub,  // sendbuf
+                    xSub_counts.cnts[rank], //sendcount
+                    MPI_DOUBLE,//sendtype
+                    X.data,  //recvbuf
+                    xSub_counts.cnts, //* recvcounts
+                    xSub_counts.displs,// *displs
+                    MPI_DOUBLE,world);
+
+
+
+    if(rank ==0 ){
+      // char *arrbuf = bufArr( X.data,  X.rows *  X.cols);
+      // printf("Rank %d received %s\n", rank, arrbuf);
+
+    }
+    
+
+    if(count != iterationNum-1){
+        X = calcNorm(X);
+        if(rank ==ROOT){
+          printf("Count = %d Printing X:\n", count);
+          puts("++++++++");
+          printMatrix(X);
+          puts("++++++++");
+
+        }
+    }
+
+    count++; 
+  }
 
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// double powerMethod(Matrix A, Matrix X, int originalRows, int originalCols, int iterationNum, double epsilon) {
+
+// // if(rank ==0) printMatrix(A);
+//   // if(rank ==1) printMatrix(A);
+
+//   SGData xSub_counts =  getSGCounts(originalRows, originalCols ,worldSize);
+//   // everyonePrint(rank,"dipls=",xSub_counts.displs );
+//   // everyonePrint(rank,"cnts=",xSub_counts.cnts );
+//   // for(int i =0; i< worldSize ;i++){
+//   //   xSub_counts.cnts[i] = xSub_counts.cnts[i] / originalRows;
+//   //   xSub_counts.displs[i] = xSub_counts.displs[i] / originalRows;
+    
+//   // }
+//   int count = 0; 
+//   double E = 1;
+//   // printf("epsilon: %0.10f\n", epsilon);
+//   while(count < iterationNum && E > epsilon){
+//     Matrix Xsub = matrixMultiplication(A, X);
+//     if(rank==0 )printMatrix(Xsub);
+//     // printf("rank=%d counts=%d displs=%d \n", rank, xSub_counts.cnts[rank],xSub_counts.displs[rank]);
+    
+
+//     MPI_Allgatherv(
+//                   Xsub.data,  // sendbuf
+//                   xSub_counts.cnts[rank], //sendcount
+//                   MPI_DOUBLE,//sendtype
+//                   X.data,  //recvbuf
+//                   xSub_counts.cnts, //* recvcounts
+//                   xSub_counts.displs,// *displs
+//                   MPI_DOUBLE,world);
+//     // char *arrbuf = bufArr( X.data,  X.rows *  X.cols);
+//     // printf("Rank %d received %s\n", rank, arrbuf);
+
+//     Matrix diff = matrixSubtraction(Xsub, X);
+
+//     E = fabs(euclidean_norm(diff));
+//     // printf("======\n");
+//     // printMatrix(X);
+//     // printMatrix(Xsub);
+//     // printf("======\n");
+//     // printf("rank %d count ==%d e=%1.20f \n", rank, count, E);
+
+//     if(count != iterationNum-1){
+//       X = calcNorm(X);
+//       if(rank ==ROOT){
+//         // printf("Count = %d Printing X:\n", count);
+//         // printMatrix(X);
+//       }
+//     }else if (count == iterationNum-1 || E < epsilon){
+//       if(E < epsilon){
+//         // printf("count ==%d e=%1.20f break loop\n", count, E);
+//         printf("Breaking loop");
+//       }
+//         // printf("answer=%f ", calcEigen(X));
+//         return calcEigen(X);
+//     }
+//     count++;
+
+//   }
+
+// } 
+
+
+
+// // returns the principle eigenvalue of the vector 
+// double powerMethodEigen(Matrix A, Matrix X, int originalRows, int originalCols, int iterationNum, double epsilon){
+
+//   if(rank ==0) printMatrix(A);
+//   puts("");
+//   if(rank ==0) printMatrix(A);
+//   puts("X");
+//    printMatrix(X);
+//   // everyonePrint(rank,"dipls=",xSub_counts.displs );
+
+
+//   // SGData xSub_counts =  getSGCounts(originalRows, originalCols ,worldSize);
+//   // everyonePrint(rank,"dipls=",xSub_counts.displs );
+//   // everyonePrint(rank,"cnts=",xSub_counts.cnts );
+//   // for(int i =0; i< worldSize ;i++){
+//   //   xSub_counts.cnts[i] = xSub_counts.cnts[i] / originalRows;
+//   //   xSub_counts.displs[i] = xSub_counts.displs[i] / originalRows;
+    
+//   // }
+//   // int count = 0; 
+//   // double E = 1;
+//   // // printf("epsilon: %0.10f\n", epsilon);
+//   // while(count < iterationNum && E > epsilon){
+//     Matrix Xsub = matrixMultiplication(A, X);
+//     // if(rank==0 )printMatrix(Xsub);
+//     puts("Xsub");
+//     printMatrix(Xsub);
+//   //   // printf("rank=%d counts=%d displs=%d \n", rank, xSub_counts.cnts[rank],xSub_counts.displs[rank]);
+    
+
+//   //   MPI_Allgatherv(
+//   //                 Xsub.data,  // sendbuf
+//   //                 xSub_counts.cnts[rank], //sendcount
+//   //                 MPI_DOUBLE,//sendtype
+//   //                 X.data,  //recvbuf
+//   //                 xSub_counts.cnts, //* recvcounts
+//   //                 xSub_counts.displs,// *displs
+//   //                 MPI_DOUBLE,world);
+//   //   // char *arrbuf = bufArr( X.data,  X.rows *  X.cols);
+//   //   // printf("Rank %d received %s\n", rank, arrbuf);
+
+//   //   Matrix diff = matrixSubtraction(Xsub, X);
+
+//   //   E = fabs(euclidean_norm(diff));
+//   //   // printf("======\n");
+//   //   // printMatrix(X);
+//   //   // printMatrix(Xsub);
+//   //   // printf("======\n");
+//   //   // printf("rank %d count ==%d e=%1.20f \n", rank, count, E);
+
+//   //   if(count != iterationNum-1){
+//   //     X = calcNorm(X);
+//   //     if(rank ==ROOT){
+//   //       // printf("Count = %d Printing X:\n", count);
+//   //       // printMatrix(X);
+//   //     }
+//   //   }else if (count == iterationNum-1 || E < epsilon){
+//   //     if(E < epsilon){
+//   //       // printf("count ==%d e=%1.20f break loop\n", count, E);
+//   //       printf("Breaking loop");
+//   //     }
+//   //       // printf("answer=%f ", calcEigen(X));
+//   //       return calcEigen(X);
+//   //   }
+//   //   count++;
+
+//   // }
+// // }
