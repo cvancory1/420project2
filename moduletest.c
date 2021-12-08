@@ -117,7 +117,7 @@ int main(int argc, char **argv) {
       malloc(test.rows * 2 * sizeof(int) *
              sizeof(int *));  // size of the lengths and size of the int *
   int MALLOCEDSIZE = 10;
-  int lengths[] = {1, 2, 2, 0, 3};
+  int lengths [] = {1, 2, 2, 0, 3};
   int indexes[] = {0, 0, 4, 2,
                    3, 2, 3, 4};  // col index of where the 1's are located
 
@@ -132,8 +132,7 @@ int main(int argc, char **argv) {
       for (int j = 0; j < listA[i].length; j++) {
         listA[i].data[j] = indexes[count++];
       }
-      // printf("printing matrix i=%d  listA[i].length =%d \n", i,
-      // listA[i].length);
+      // printf("printing matrix i=%d  listA[i].length =%d \n", i, listA[i].length);
 
       listA[i].globalID = -1;
       // Matrixlengths.data[i] = 0;
@@ -156,7 +155,7 @@ int main(int argc, char **argv) {
   int *localLenghts = malloc(sizeof(int) * length_counts.cnts[rank]);
 
   // scattering the lengths
-  MPI_Scatterv(lengths,                   // sendbuf
+  MPI_Scatterv(&lengths,                   // sendbuf
                length_counts.cnts,        // sendcnts
                length_counts.displs,      // displacements
                MPI_INT,                   // datatype
@@ -170,7 +169,7 @@ int main(int argc, char **argv) {
   // if(rank == 1){
   for (int i = 0; i < length_counts.cnts[rank]; i++) {
     // everyonePrint(rank, "arr=", localLenghts[i]);
-    // printf("arr=%d\n", localLenghts[i]);
+    printf(" i = %d arr=%d \n", i, localLenghts[i]);
   }
 
   // }
