@@ -175,22 +175,21 @@ int main(int argc, char **argv) {
   // }
 
 
-  // MPI_Barrier(world);
-  // // everyone malloc their own local structs of listA
-  // AdjacenyList *locallistA =
-  //     malloc(length_counts.cnts[rank] * sizeof(AdjacenyList));
-  // for (int i = 0; i < length_counts.cnts[rank]; i++) {
-  //   locallistA[i].length = localLenghts[i];
+  MPI_Barrier(world);
+  // everyone malloc their own local structs of listA
+  AdjacenyList *locallistA = malloc(length_counts.cnts[rank] * sizeof(AdjacenyList));
+  for (int i = 0; i < length_counts.cnts[rank]; i++) {
+    locallistA[i].length = localLenghts[i];
 
-  //   if (locallistA[i].length > 0) {
-  //     locallistA[i].data = malloc(localLenghts[i] * sizeof(int));
-  //   } else {
-  //     // locallistA[i].data = malloc( 1 * sizeof(int));;
-  //     // locallistA[i].data[0] =-1;
-  //     locallistA[i].data = NULL;
-  //   }
-  //   locallistA[i].globalID = -1;
-  // }
+    if (locallistA[i].length > 0) {
+      locallistA[i].data = malloc(localLenghts[i] * sizeof(int));
+    } else {
+      // locallistA[i].data = malloc( 1 * sizeof(int));;
+      // locallistA[i].data[0] =-1;
+      locallistA[i].data = NULL;
+    }
+    locallistA[i].globalID = -1;
+  }
 
   // // root sends the adjacenylist data
   // if (rank == 0) {
