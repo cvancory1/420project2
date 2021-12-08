@@ -328,7 +328,6 @@ double powerMethod(Matrix A, Matrix X, int originalRows,int originalCols , int i
 
 
 // locallistSize = rows in Xsub 
-
 void newpowermethod(AdjacenyList * listA, Matrix  X, int localListSize, int TOTALLISTSIZE, int iterationNum , double epsilon ){
   // printf("ENTER rank =%d localListSize=%d\n", rank, localListSize);
   // if(rank ==0 ) printf("rows=%d cols=%d\n", X.rows, X.cols);
@@ -348,6 +347,8 @@ void newpowermethod(AdjacenyList * listA, Matrix  X, int localListSize, int TOTA
   // double * xsub = malloc( localListSize * sizeof(double)); 
   // for(int i =0 ; i <localListSize; i++ )xsub[i] =0; 
 
+  // evey proc calculates locallistsize amount of rows in X 
+  Matrix xsub;
   xsub.rows = localListSize;
   xsub.cols = 1;
   xsub.data = malloc( localListSize * sizeof(double)); 
@@ -404,6 +405,10 @@ void newpowermethod(AdjacenyList * listA, Matrix  X, int localListSize, int TOTA
     }
 
     
+    
+    if(E < epsilon ){
+      printf("========RETURN EARLY Count = %d Printing X: (========\n", count);
+    }
 
     if(count < iterationNum ){
         X = calcNorm(X);
@@ -416,9 +421,6 @@ void newpowermethod(AdjacenyList * listA, Matrix  X, int localListSize, int TOTA
         }
     }else if(count == iterationNum || E < epsilon) {
       // return X; 
-      if(E < epsilon ){
-        printf("========RETURN EARLY Count = %d Printing X: (========\n", count);
-      }
       puts(" ------- ");
       printf("Count = %d Printing X:\n", count);
       printMatrix(X);
