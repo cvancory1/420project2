@@ -212,8 +212,8 @@ int main(int argc, char **argv) {
       // printf(
       //     " ====rank =%d count =%d  i=%d destRoot =%d cnts[sendRoot]=%d "
       //     "arr[0]= %d lengthsent[i]=%d  \n",
-          rank, count, i, sendRoot, length_counts.cnts[sendRoot],
-          listA[i].data[0], listA[i].length);
+          // rank, count, i, sendRoot, length_counts.cnts[sendRoot],
+          // listA[i].data[0], listA[i].length);
 
       count++;
 
