@@ -117,9 +117,21 @@ int main(int argc, char **argv) {
       malloc(test.rows * 2 * sizeof(int) *
              sizeof(int *));  // size of the lengths and size of the int *
   int MALLOCEDSIZE = 10;
-  int lengths [] = {1, 2, 2, 0, 3};
-  int indexes[] = {0, 0, 4, 2,
+  int lengthsData [] = {1, 2, 2, 0, 3};
+  int indexesData[] = {0, 0, 4, 2,
                    3, 2, 3, 4};  // col index of where the 1's are located
+  int * lengths;
+  int * indexes;
+
+  if (rank == ROOT) {
+    lengths = malloc(sizeof(int) * 5);
+    indexes = malloc(sizeof(int) * 8);
+    for(int i =0 ;i < 5 ;i++) lengths[i] = lengthsData[i];
+    for(int i =0 ;i < 8 ;i++) indexes[i] = indexesData[i];
+
+    
+  }
+  
 
   if (rank == ROOT) {
     // Matrixlengths.data =malloc(Matrixlengths.rows * Matrixlengths.cols *
@@ -154,8 +166,9 @@ int main(int argc, char **argv) {
 
   int *localLenghts = malloc(sizeof(int) * length_counts.cnts[rank]);
 
+  puts("here");
   // scattering the lengths
-  MPI_Scatterv(&lengths,                   // sendbuf
+  MPI_Scatterv(lengths,                   // sendbuf
                length_counts.cnts,        // sendcnts
                length_counts.displs,      // displacements
                MPI_INT,                   // datatype
@@ -165,6 +178,7 @@ int main(int argc, char **argv) {
 
   // char *arrbuf = bufArr( localLenghts, length_counts.cnts[rank] );
   // printf("Rank %d received %s\n", rank, arrbuf);
+
 
   // if(rank == 1){
   for (int i = 0; i < length_counts.cnts[rank]; i++) {
@@ -197,7 +211,7 @@ int main(int argc, char **argv) {
     int count = 0;
     for (int i = 0; i < test.rows; i++) {
       for (int j = 0; j < listA[i].length; j++) {
-        // printf("list i=%d j=%d arr= %d \n", i, j , listA[i].data[j]);
+        printf("list i=%d j=%d arr= %d \n", i, j , listA[i].data[j]);
       }
       // printf("sendroot=%d  i=%d  count=%d \n",sendRoot, i, count );
 
@@ -212,8 +226,8 @@ int main(int argc, char **argv) {
       // printf(
       //     " ====rank =%d count =%d  i=%d destRoot =%d cnts[sendRoot]=%d "
       //     "arr[0]= %d lengthsent[i]=%d  \n",
-          // rank, count, i, sendRoot, length_counts.cnts[sendRoot],
-          // listA[i].data[0], listA[i].length);
+      //     rank, count, i, sendRoot, length_counts.cnts[sendRoot],
+      //     listA[i].data[0], listA[i].length);
 
       count++;
 
