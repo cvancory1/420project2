@@ -1,15 +1,7 @@
 # makefile
-
-module2: module2.o
-	mpicc -std=c99 -g -lm -lsqlite3 module2.o -o  module2
-	mpirun -n 3 ./module2
-
-module2.o: module2.c matrixFunctions.c
-	mpicc -std=c99 -g -c  module2.c
-
 moduletest: moduletest.o
 	mpicc -std=c99 -g -s -lm -lsqlite3 moduletest.o -o  moduletest
-	mpirun -n 2 ./moduletest
+	mpirun -n 3 ./moduletest
 
 moduletest.o: moduletest.c matrixFunctions.c
 	mpicc -std=c99 -g -c  moduletest.c
