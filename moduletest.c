@@ -167,6 +167,7 @@ int main(int argc, char **argv) {
   int *localLenghts = malloc(sizeof(int) * length_counts.cnts[rank]);
 
   puts("here");
+  
   // scattering the lengths
   MPI_Scatterv(lengths,                   // sendbuf
                length_counts.cnts,        // sendcnts
@@ -176,8 +177,8 @@ int main(int argc, char **argv) {
                length_counts.cnts[rank],  // recvcnt
                MPI_INT, ROOT, world);
 
-  // char *arrbuf = bufArr( localLenghts, length_counts.cnts[rank] );
-  // printf("Rank %d received %s\n", rank, arrbuf);
+  char *arrbuf = bufArr( localLenghts, length_counts.cnts[rank] );
+  printf("Rank %d received %s\n", rank, arrbuf);
 
 
   // if(rank == 1){
