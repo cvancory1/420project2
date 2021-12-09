@@ -201,21 +201,19 @@ int main(int argc, char **argv) {
     if (locallistA[i].length > 0) {
       locallistA[i].data = malloc(localLenghts[i] * sizeof(int));
     } else {
-      // locallistA[i].data = malloc( 1 * sizeof(int));;
-      // locallistA[i].data[0] =-1;
       locallistA[i].data = NULL;
     }
     locallistA[i].globalID = -1;
   }
 
   // // // root sends the adjacenylist data
-  // if (rank == 0) {
-  //   int sendRoot = 0;
-  //   int count = 0;
-  //   for (int i = 0; i < test.rows; i++) {
-  //     for (int j = 0; j < listA[i].length; j++) {
-  //       printf("list i=%d j=%d arr= %d \n", i, j , listA[i].data[j]);
-  //     }
+  if (rank == 0) {
+    int sendRoot = 0;
+    int count = 0;
+    for (int i = 0; i < test.rows; i++) {
+      for (int j = 0; j < listA[i].length; j++) {
+        printf("list i=%d j=%d arr= %d \n", i, j , listA[i].data[j]);
+      }
   //     // printf("sendroot=%d  i=%d  count=%d \n",sendRoot, i, count );
 
   //     MPI_Send(listA[i].data,    // buf
@@ -239,8 +237,8 @@ int main(int argc, char **argv) {
   //       sendRoot++;
   //       count = 0;
   //     }
-  //   }
-  // }
+    }
+  }
 
   // int number_amount;
 
