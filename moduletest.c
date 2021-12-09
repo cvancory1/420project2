@@ -259,15 +259,15 @@ int main(int argc, char **argv) {
 
   // printMatrix(localTest);
   double e = 10E-16;
-  printf("-%p \n", ones.data);
-  newpowermethod(locallistA, ones, length_counts.cnts[rank], 5, 5, e);
+  // printf("-%p \n", ones.data);
+  // newpowermethod(locallistA, ones, length_counts.cnts[rank], 5, 5, e);
   
   // MPI_Barrier(world);
 
-  if(rank == ROOT){
-    puts("=======-priting X ------");
-    printMatrix(ones);
-  }
+  // if(rank == ROOT){
+  //   puts("=======-priting X ------");
+  //   printMatrix(ones);
+  // }
     
   
 
