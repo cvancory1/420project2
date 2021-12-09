@@ -206,7 +206,75 @@ int main(int argc, char **argv) {
     locallistA[i].globalID = -1;
   }
 
-  // // // root sends the adjacenylist data
+  
+
+
+
+
+
+
+
+
+
+  // OLD VERSION  
+   if (rank == 0) {
+    int sendRoot = 0;
+    int count = 0;
+
+    for (int i = 0; i < test.rows; i++) {
+      for (int j = 0; j < listA[i].length; j++) {
+        // printf("list i=%d j=%d arr= %d \n", i, j , listA[i].data[j]);
+      }
+      // printf("rank =%d sendroot=%d  i=%d  count=%d length =%d \n",rank, sendRoot, i, count,  listA[i].length );
+
+
+      MPI_Send(listA[i].data,    // buf
+          listA[i].length,  // amount sending - count 
+          MPI_INT,          // dtype
+          sendRoot,         //  dest
+          sendRoot,         // tag
+          world         // comm
+      );
+    
+    // printf("j=%d arr= %d sendRoot =%d \n", i , listA[i].data[0], sendRoot);
+      // printf(
+      //     " ====rank =%d count =%d  i=%d destRoot =%d cnts[sendRoot]=%d "
+      //     "arr[0]= %d lengthsent[i]=%d  \n",
+      //     rank, count, i, sendRoot, length_counts.cnts[sendRoot],
+      //     listA[i].data[0], listA[i].length);
+ 
+      
+      count++;
+
+      if (count == length_counts.cnts[sendRoot]) {
+        // printf("sendroot=%d  i=%d  count=%d \n",sendRoot, i, count );
+        sendRoot++;
+        count = 0;
+      }
+    }
+  }
+
+
+  MPI_Barrier(world);
+  printf("rank=%d finished \n",rank);
+
+  int number_amount;
+  int i = 0;
+  for (i = 0; i < length_counts.cnts[rank]; i++) {
+    MPI_Status status;
+
+    MPI_Recv(locallistA[i].data, localLenghts[i], MPI_INT, ROOT, MPI_ANY_TAG,
+            world, &status);
+
+    MPI_Get_count(&status, MPI_INT , &number_amount);
+    printf("received %d numbers from 0. Message source = %d, "
+    "tag = %d\n", number_amount, status.MPI_SOURCE, status.MPI_TAG);
+  }
+
+
+
+//TEST VERSION 
+// // // root sends the adjacenylist data
   // if (rank == 0) {
   //   int sendRoot = 0;
   //   int count = 0;
@@ -269,70 +337,6 @@ int main(int argc, char **argv) {
 
 
   // }
-
-
-
-
-
-
-
-
-
-  // OLD VERSION  
-   if (rank == 0) {
-    int sendRoot = 0;
-    int count = 0;
-
-    for (int i = 0; i < test.rows; i++) {
-      for (int j = 0; j < listA[i].length; j++) {
-        // printf("list i=%d j=%d arr= %d \n", i, j , listA[i].data[j]);
-      }
-      // printf("rank =%d sendroot=%d  i=%d  count=%d length =%d \n",rank, sendRoot, i, count,  listA[i].length );
-
-
-      MPI_Send(listA[i].data,    // buf
-          listA[i].length,  // amount sending - count 
-          MPI_INT,          // dtype
-          sendRoot,         //  dest
-          sendRoot,         // tag
-          world         // comm
-      );
-    
-    // printf("j=%d arr= %d sendRoot =%d \n", i , listA[i].data[0], sendRoot);
-      // printf(
-      //     " ====rank =%d count =%d  i=%d destRoot =%d cnts[sendRoot]=%d "
-      //     "arr[0]= %d lengthsent[i]=%d  \n",
-      //     rank, count, i, sendRoot, length_counts.cnts[sendRoot],
-      //     listA[i].data[0], listA[i].length);
- 
-      
-      count++;
-
-      if (count == length_counts.cnts[sendRoot]) {
-        // printf("sendroot=%d  i=%d  count=%d \n",sendRoot, i, count );
-        sendRoot++;
-        count = 0;
-      }
-    }
-  }
-
-
-
-  printf("rank=%d finished \n",rank);
-
-  int number_amount;
-  int i = 0;
-  for (i = 0; i < length_counts.cnts[rank]; i++) {
-    MPI_Status status;
-
-    MPI_Recv(locallistA[i].data, localLenghts[i], MPI_INT, ROOT, MPI_ANY_TAG,
-            world, &status);
-
-    MPI_Get_count(&status, MPI_INT , &number_amount);
-    printf("received %d numbers from 0. Message source = %d, "
-    "tag = %d\n", number_amount, status.MPI_SOURCE, status.MPI_TAG);
-  }
-
 
 
 
