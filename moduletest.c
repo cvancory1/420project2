@@ -225,7 +225,7 @@ int main(int argc, char **argv) {
       for (int j = 0; j < listA[i].length; j++) {
         // printf("list i=%d j=%d arr= %d \n", i, j , listA[i].data[j]);
       }
-      // printf("rank =%d sendroot=%d  i=%d  count=%d length =%d \n",rank, sendRoot, i, count,  listA[i].length );
+      printf("rank =%d sendroot=%d  i=%d  count=%d listlength =%d lengths=%d \n",rank, sendRoot, i, count,  listA[i].length, localLenghts[i] );
 
 
       MPI_Send(listA[i].data,    // buf
@@ -235,6 +235,14 @@ int main(int argc, char **argv) {
           sendRoot,         // tag
           world         // comm
       );
+
+      MPI_Status status;
+
+      if(i< length_counts.cnts[rank]){
+        MPI_Recv(locallistA[i].data, localLenghts[i], MPI_INT, ROOT, MPI_ANY_TAG,
+              world, &status);  
+      }
+      
     
     // printf("j=%d arr= %d sendRoot =%d \n", i , listA[i].data[0], sendRoot);
       // printf(
@@ -255,7 +263,6 @@ int main(int argc, char **argv) {
   }
 
 
-  MPI_Barrier(world);
   printf("rank=%d finished \n",rank);
 
   int number_amount;
