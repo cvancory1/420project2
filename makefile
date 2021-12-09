@@ -8,7 +8,7 @@ module2.o: module2.c matrixFunctions.c
 	mpicc -std=c99 -g -c  module2.c
 
 moduletest: moduletest.o
-	mpicc -std=c99 -g -lm -lsqlite3 moduletest.o -o  moduletest
+	mpicc -std=c99 -g -s -lm -lsqlite3 moduletest.o -o  moduletest
 	mpirun -n 2 ./moduletest
 
 moduletest.o: moduletest.c matrixFunctions.c
@@ -31,6 +31,8 @@ clean:
 	rm -f *.o
 	rm -f time module2 
 	rm -f module1
-
+val:
+	make moduletest
+	mpirun -n 2  valgrind --track-origins=yes ./moduletest
 	
 
