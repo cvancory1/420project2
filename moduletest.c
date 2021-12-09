@@ -225,6 +225,8 @@ int main(int argc, char **argv) {
           sendRoot,         // tag
           world         // comm
       );
+     MPI_Recv(locallistA[i].data, localLenghts[i], MPI_INT, ROOT, MPI_ANY_TAG,
+             world, &status);
 
       // printf("j=%d arr= %d sendRoot =%d \n", i , listA[i].data[0], sendRoot);
       // printf(
