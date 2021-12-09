@@ -214,29 +214,29 @@ int main(int argc, char **argv) {
       for (int j = 0; j < listA[i].length; j++) {
         printf("list i=%d j=%d arr= %d \n", i, j , listA[i].data[j]);
       }
-  //     // printf("sendroot=%d  i=%d  count=%d \n",sendRoot, i, count );
+      printf("sendroot=%d  i=%d  count=%d \n",sendRoot, i, count );
 
-  //     MPI_Send(listA[i].data,    // buf
-  //              listA[i].length,  // count
-  //              MPI_INT,          // dtype
-  //              sendRoot,         //  dest
-  //              sendRoot,         // tag
-  //              world             // comm
-  //     );
-  //     // printf("j=%d arr= %d sendRoot =%d \n", i , listA[i].data[0], sendRoot);
-  //     // printf(
-  //     //     " ====rank =%d count =%d  i=%d destRoot =%d cnts[sendRoot]=%d "
-  //     //     "arr[0]= %d lengthsent[i]=%d  \n",
-  //     //     rank, count, i, sendRoot, length_counts.cnts[sendRoot],
-  //     //     listA[i].data[0], listA[i].length);
+      MPI_Send(listA[i].data,    // buf
+               listA[i].length,  // count
+               MPI_INT,          // dtype
+               sendRoot,         //  dest
+               sendRoot,         // tag
+               world             // comm
+      );
+      printf("j=%d arr= %d sendRoot =%d \n", i , listA[i].data[0], sendRoot);
+      printf(
+          " ====rank =%d count =%d  i=%d destRoot =%d cnts[sendRoot]=%d "
+          "arr[0]= %d lengthsent[i]=%d  \n",
+          rank, count, i, sendRoot, length_counts.cnts[sendRoot],
+          listA[i].data[0], listA[i].length);
 
-  //     count++;
+      count++;
 
-  //     if (count == length_counts.cnts[sendRoot]) {
-  //       // printf("sendroot=%d  i=%d  count=%d \n",sendRoot, i, count );
-  //       sendRoot++;
-  //       count = 0;
-  //     }
+      if (count == length_counts.cnts[sendRoot]) {
+        // printf("sendroot=%d  i=%d  count=%d \n",sendRoot, i, count );
+        sendRoot++;
+        count = 0;
+      }
     }
   }
 
