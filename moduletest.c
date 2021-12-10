@@ -112,7 +112,7 @@ int main(int argc, char **argv) {
       test.data[i] = arr2[i];
     }
   }else{
-    test.data =NULL:
+    test.data =NULL;
 
   }
 
@@ -320,9 +320,9 @@ int main(int argc, char **argv) {
   if(test.data != NULL) free(test.data);
 
   if(ones.data!= NULL) free(ones.data);
-  if(length_counts.cnts!= NULL) free(length_counts.cnts);
-  if(length_counts.displs!= NULL) free(length_counts.displs);
-  if(localLenghts!= NULL) free(localLenghts);
+  free(length_counts.cnts);
+ //free(length_counts.displs);
+ // free(localLenghts);
 
   if(rank == ROOT){
      for (int i = 0; i < test.rows; i++) {
