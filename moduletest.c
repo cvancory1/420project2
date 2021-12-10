@@ -314,6 +314,15 @@ int main(int argc, char **argv) {
   // TODO include the lab4 case in this folder
 
 
+  for (int i = 0; i < length_counts.cnts[rank]; i++) {
+      if(locallistA[i].data != NULL ) free( locallistA[i].data); 
+  }
+
+   if(rank == ROOT){
+     for (int i = 0; i < test.rows; i++) {
+      free( listA[i].data); 
+    }
+  }
 
   if(lengths!= NULL) free(lengths);
   if(indexes!= NULL) free(indexes);
@@ -324,15 +333,9 @@ int main(int argc, char **argv) {
  //free(length_counts.displs);
  // free(localLenghts);
 
-  if(rank == ROOT){
-     for (int i = 0; i < test.rows; i++) {
-      free( listA[i].data); 
-    }
-  }
+ 
 
-  for (int i = 0; i < length_counts.cnts[rank]; i++) {
-      if(locallistA[i].data != NULL ) free( locallistA[i].data); 
-  }
+  
  
   free(locallistA);
   free(listA);
