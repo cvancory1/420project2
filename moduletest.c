@@ -329,9 +329,16 @@ int main(int argc, char **argv) {
       free( listA[i].data); 
     }
   }
+
+  for (int i = 0; i < length_counts.cnts[rank]; i++) {
+      if(locallistA[i].data != NULL ) free( locallistA[i].data); 
+  }
  
+  free(locallistA);
+  free(listA);
   sqlite3_close(db);
   MPI_Finalize();
+  
 
   return 0;
 }
