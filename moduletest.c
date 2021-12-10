@@ -111,6 +111,9 @@ int main(int argc, char **argv) {
     for (int i = 0; i < test.rows * test.cols; i++) {
       test.data[i] = arr2[i];
     }
+  }else{
+    test.data =NULL:
+
   }
 
   AdjacenyList *listA =
@@ -311,22 +314,21 @@ int main(int argc, char **argv) {
   // TODO include the lab4 case in this folder
 
 
-  MPI_Barrier(world);
 
   if(lengths!= NULL) free(lengths);
   if(indexes!= NULL) free(indexes);
   if(test.data != NULL) free(test.data);
 
-  // if(ones.data!= NULL) free(ones.data);
-  // if(length_counts.cnts!= NULL) free(length_counts.cnts);
-  // if(length_counts.displs!= NULL) free(length_counts.displs);
-  // if(localLenghts!= NULL) free(localLenghts);
+  if(ones.data!= NULL) free(ones.data);
+  if(length_counts.cnts!= NULL) free(length_counts.cnts);
+  if(length_counts.displs!= NULL) free(length_counts.displs);
+  if(localLenghts!= NULL) free(localLenghts);
 
-  // if(rank == ROOT){
-  //    for (int i = 0; i < test.rows; i++) {
-  //     free( listA[i].data); 
-  //   }
-  // }
+  if(rank == ROOT){
+     for (int i = 0; i < test.rows; i++) {
+      free( listA[i].data); 
+    }
+  }
  
   sqlite3_close(db);
   MPI_Finalize();
