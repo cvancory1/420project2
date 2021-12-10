@@ -173,6 +173,7 @@ int main(int argc, char **argv) {
                              // and an actual paperID
     srand(time(0) + rank);
 
+    // while stuff to read in the file 
     while ((numread = getline(&line, &len, fp)) != -1) {
       int length = strlen(line);
       sendcnt[i] += numread;  // tracks the total amount of bytes
@@ -274,28 +275,32 @@ int main(int argc, char **argv) {
     }
   }
 
-  //  printing results
-  if (rank == ROOT) {
-    for (int i = 0; i < TOTALPAPERS; i++) {
+  //  printing results of the sparse matrix in listA 
+  // if (rank == ROOT) {
+  //   for (int i = 0; i < TOTALPAPERS; i++) {
       // printf("i=%d listA.length= %d globalID=%d \n", i,
       // listA[i].length,listA[i].globalID  );
 
       // if(listA[i].length>0){
       //   printf("i=%d listA.length= %d\n", i, listA[i].length );
       // }
-    }
+    // }
     // puts("");
-  }
+  // }
 
   // printf("rank =%d finish\n", rank);
+
+
+
+
+
 
   // scatter the lengths matrix
   SGData length_counts = getSGCounts(TOTALPAPERS, 1, worldSize);
   // everyonePrint(rank, "disls=", length_counts.displs);
   // everyonePrint(rank, "cnts=", length_counts.cnts);
 
-  // //  allocate to recv the number of 1's for each row ... will be used to
-  // malloc later
+  // //  allocate to recv the number of 1's for each row ... will be used to  malloc later
   int *localLenghts = malloc(sizeof(int) * length_counts.cnts[rank]);
 
   // scattering the lengths
@@ -312,9 +317,9 @@ int main(int argc, char **argv) {
     // printf("rank =%d arr=%d i=%d \n", rank, localLenghts[i], i);
   }
 
+
   // allocate local adjacency list and malloc arrays based off of lengths in 1's
-  AdjacenyList *locallistA =
-      malloc(length_counts.cnts[rank] * sizeof(AdjacenyList));
+  AdjacenyList *locallistA = malloc(length_counts.cnts[rank] * sizeof(AdjacenyList));
   for (int i = 0; i < length_counts.cnts[rank]; i++) {
     locallistA[i].length = localLenghts[i];
 
@@ -326,8 +331,8 @@ int main(int argc, char **argv) {
     locallistA[i].globalID = -1;
   }
 
+  // root sends the adjacenylist data to all other nodes TODO - refer to moduletest 
   MPI_Barrier(world);
-  // root sends the adjacenylist data
   if (rank == 0) {
     int sendRoot = 0;
     int count = 0;
@@ -351,7 +356,7 @@ int main(int argc, char **argv) {
         // printf("sendroot=%d  i=%d  count=%d \n",sendRoot, i, count );
         sendRoot++;
         count = 0;
-        puts("");
+        // puts("");
       }
     }
   }
@@ -396,7 +401,7 @@ int main(int argc, char **argv) {
       }
     }
   }
-
+/*
   // for testing- print actal matrix
   if (rank == 0) {
     for (int i = 0; i < TOTALPAPERS; i++) {
@@ -432,13 +437,13 @@ int main(int argc, char **argv) {
   double e = 10E-16;
   // Matrix pageRanks = newpowermethod(locallistA, X, length_counts.cnts[rank],
   // TOTALPAPERS, 6, e ); printf("IN MAIN rank=%d pointer=%p\n", rank, X.data);
-  newpowermethod(locallistA, X, length_counts.cnts[rank], TOTALPAPERS, 10, e);
+  // newpowermethod(locallistA, X, length_counts.cnts[rank], TOTALPAPERS, 10, e);
 
   // puts("outside powermethod ");
   if (rank == ROOT) {
     for (int i =0 ; i < TOTALPAPERS ; i++){
     // printf("data=%f \n", pageRanks.data[i]);
-    printf("data=%f \n", X.data[i]);
+    // printf("data=%f \n", X.data[i]);
     }
     // printf("data=%f \n", X.data[0]);
   }
@@ -461,6 +466,7 @@ int main(int argc, char **argv) {
   //   free(query);
   // }
 
+*/
   sqlite3_close(db);
   MPI_Finalize();
 
