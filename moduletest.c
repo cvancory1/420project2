@@ -330,8 +330,8 @@ int main(int argc, char **argv) {
 
   if(ones.data!= NULL) free(ones.data);
   free(length_counts.cnts);
- //free(length_counts.displs);
- // free(localLenghts);
+  free(length_counts.displs);
+  free(localLenghts);
 
  
 
