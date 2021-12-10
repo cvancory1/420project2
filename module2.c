@@ -112,6 +112,9 @@ int main(int argc, char **argv) {
 
   if (fp == NULL) printf("ERROR opening file ");
 
+
+
+
   // // tracks the amount of papers each proc will read in
   int *localPapercount = findCounts(TOTALPAPERS, worldSize);
 
@@ -128,8 +131,8 @@ int main(int argc, char **argv) {
   // // printf("      rank=%d rows =%d \n", rank,  Matrixlengths.rows);
 
   // initialize & allocate listA for power method
-  /* assume there are at least 10 citations and allocate, if more than
-  reallocate later */
+  //  assume there are at least 10 citations and allocate, if more than
+  // reallocate later 
 
   // vector for powermethod, only stores the lengths
   AdjacenyList *listA = malloc(TOTALPAPERS * 2 * sizeof(int) * sizeof(int *));
@@ -152,8 +155,10 @@ int main(int argc, char **argv) {
     Matrixlengths = NULL;
   }
 
-  // /* does calcs for number of bytes every proc needs to read in based on even
-  //  * division of papers */
+
+/* 
+  // does calcs for number of bytes every proc needs to read in based on even
+  //   division of papers 
   if (rank == ROOT) {
     char *line = NULL;
     int numread;
