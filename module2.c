@@ -383,8 +383,26 @@ if (rank == 0) {
   } 
 
 
+  // other proc recv 
+  if(rank != 0){
+    int number_amount;
+    int i = 0;
+    for (i = 0; i < length_counts.cnts[rank]; i++) {
+      MPI_Status status;
 
+      MPI_Recv(locallistA[i].data, localLenghts[i], MPI_INT, ROOT, MPI_ANY_TAG,
+                world, &status);
 
+      MPI_Get_count(&status, MPI_INT, &number_amount);
+      printf(
+          "received %d numbers from 0. Message source = %d, "
+          "tag = %d\n",
+          number_amount, status.MPI_SOURCE, status.MPI_TAG);
+    }
+
+    puts("");
+
+  }
 
 
 
