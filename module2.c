@@ -331,12 +331,78 @@ int main(int argc, char **argv) {
     locallistA[i].globalID = -1;
   }
 
+
+
+  // updated version 
+
+if (rank == 0) {
+    int sendRoot = 1;
+    int count = 0;
+
+    // rank assigns(instead of mpi_sends) its own data to itself for the local list 
+    int i; 
+    for (i = 0 ; i < length_counts.cnts[ROOT]; i++) {
+      for (int j = 0; j < listA[i].length; j++) {
+        locallistA[i].data[j] = listA[i].data[j];
+        // printf("list i=%d j=%d arr= %d \n", i, j , listA[i].data[j]);
+      }
+    }
+
+
+    // send the sparisfied  list except for what the root will receive which will be handled later 
+    for (int i = length_counts.cnts[ROOT]; i < TOTALPAPERS ; i++) {
+      for (int j = 0; j < listA[i].length; j++) {
+        // printf("list i=%d j=%d arr= %d \n", i, j , listA[i].data[j]);
+      }
+      // printf("rank =%d sendroot=%d  i=%d  count=%d listlength =%d lengths=%d
+      // \n",rank, sendRoot, i, count,  listA[i].length, localLenghts[i] );
+
+      MPI_Send(listA[i].data,    // buf
+               listA[i].length,  // amount sending - count
+               MPI_INT,          // dtype
+               sendRoot,         //  dest
+               sendRoot,         // tag
+               world             // comm
+      );
+
+      // printf("j=%d arr= %d sendRoot =%d \n", i , listA[i].data[0], sendRoot);
+      // printf(
+      //     " ====rank =%d count =%d  i=%d destRoot =%d cnts[sendRoot]=%d "
+      //     "arr[0]= %d lengthsent[i]=%d  \n",
+      //     rank, count, i, sendRoot, length_counts.cnts[sendRoot],
+      //     listA[i].data[0], listA[i].length);
+
+      count++;
+
+      if (count == length_counts.cnts[sendRoot]) {
+        // printf("sendroot=%d  i=%d  count=%d \n",sendRoot, i, count );
+        sendRoot++;
+        count = 0;
+      }
+    }
+  } 
+
+
+
+
+
+
+
+
+
+
+
+
+
+  // part of the old version be careful 
+/* 
+
   // root sends the adjacenylist data to all other nodes TODO - refer to moduletest 
   MPI_Barrier(world);
   if (rank == 0) {
     int sendRoot = 0;
     int count = 0;
-    for (int i = 0; i < TOTALPAPERS; i++) {
+    for (int i = 0 ; i < TOTALPAPERS; i++) {
       for (int j = 0; j < listA[i].length; j++) {
         // printf("list i=%d j=%d arr= %d \n", i, j , listA[i].data[j]);
       }
@@ -360,6 +426,9 @@ int main(int argc, char **argv) {
       }
     }
   }
+
+
+
 
   MPI_Barrier(world);
   // puts("=======");
@@ -401,7 +470,7 @@ int main(int argc, char **argv) {
       }
     }
   }
-/*
+
   // for testing- print actal matrix
   if (rank == 0) {
     for (int i = 0; i < TOTALPAPERS; i++) {
