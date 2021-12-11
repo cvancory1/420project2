@@ -118,9 +118,6 @@ int main(int argc, char **argv) {
   // // tracks the amount of papers each proc will read in
   int *localPapercount = findCounts(TOTALPAPERS, worldSize);
 
-  // //based on localpapercount , calc the bytes ( ie cant divide bytes /
-  // worldsize since the file wouldnt be parsed correctly in every case)
-  int *sendcnt = malloc(worldSize * sizeof(int));
 
   // vector being used for the powermethod easier than scattering the struct
   // Matrix Matrixlengths;
@@ -156,14 +153,66 @@ int main(int argc, char **argv) {
   }
 
 
-/* 
+
+  // REWRITE OF THE FILE READ IN
+  if (rank == ROOT) {
+
+    char *line = NULL; // buffer to read in from the file 
+    size_t len; 
+    int lineNumber = 0; // line number in the file 
+    int totalCited = 0; // # of papers cited by the current paperID 
+    int j =0; // iterates thru data array( different lengths for every paper)
+
+
+    // while !EOF
+    while ((numread = getline(&line, &len, fp)) != -1) {
+      int length = strlen(line);
+      line[length-1 ] = 0; 
+
+    }
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
+
   // does calcs for number of bytes every proc needs to read in based on even
   //   division of papers 
   if (rank == ROOT) {
     char *line = NULL;
     int numread;
-    int curPaperCount =
-        0;  // index of the current paper we are looking at in the list
+    int curPaperCount = 0;  // index of the current paper we are looking at in the list
 
     int i = 0;
     for (i = 0; i < worldSize; i++)
@@ -178,14 +227,14 @@ int main(int argc, char **argv) {
                              // and an actual paperID
     srand(time(0) + rank);
 
-    // while stuff to read in the file 
+    // while !EOF
     while ((numread = getline(&line, &len, fp)) != -1) {
       int length = strlen(line);
       sendcnt[i] += numread;  // tracks the total amount of bytes
                               // printf("line: %s count: %zu\n", line, len);
 
       // TODO: store the paper id of the paper being read in currently
-
+      
       // assign global index of current paperid being read
       if (checkCitations == 0 && line[0] != '-') {
         // printf("listA_it =%d %s\n", listA_it , line);
@@ -205,7 +254,7 @@ int main(int argc, char **argv) {
         //  listA[listA_it].globalID = (int)sqlite3_column_int(res, 0);
         listA[listA_it].globalID = rand() % TOTALPAPERS;
       }
-      // if we are reading the citations ( versus paperid)
+      // reading the citations ( versus paperid)
       if (checkCitations == 1 && line[0] != '+') {
         // citations are being counted for current paper
         listA[listA_it].length++;
@@ -255,7 +304,7 @@ int main(int argc, char **argv) {
         checkCitations = 1;  // the next name you read in is a citation
       }
 
-      // indicates a new paper is being read in next
+      // indicates a new paper is about to be read in next
       if (line[0] == '+') {
         curPaperCount++;
         listA_it++;
@@ -279,6 +328,9 @@ int main(int argc, char **argv) {
       }
     }
   }
+
+
+
 
   //  printing results of the sparse matrix in listA 
   // if (rank == ROOT) {
@@ -418,7 +470,6 @@ if (rank == 0) {
 
 
   // part of the old version be careful 
-/* 
 
   // root sends the adjacenylist data to all other nodes TODO - refer to moduletest 
   MPI_Barrier(world);
