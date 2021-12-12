@@ -101,11 +101,11 @@ int main(int argc, char **argv) {
 
   // opens the citation file
   FILE *fp;
-  // fp = fopen("testCitations.txt", "r");
-  // int TOTALPAPERS = 50; // number of rows in the adjacenylist
+  fp = fopen("testCitations.txt", "r");
+  int TOTALPAPERS = 50; // number of rows in the adjacenylist
 
-  fp = fopen("testCitations2.txt", "r");
-  int TOTALPAPERS = 295;  // number of rows in the adjacenylist
+  // fp = fopen("testCitations2.txt", "r");
+  // int TOTALPAPERS = 295;  // number of rows in the adjacenylist
 
   // int TOTALPAPERS = 1354753;
   // fp = fopen("arxiv-citations.txt", "r");
@@ -113,10 +113,6 @@ int main(int argc, char **argv) {
   if (fp == NULL) printf("ERROR opening file ");
 
 
-
-
-  // // tracks the amount of papers each proc will read in
-  int *localPapercount = findCounts(TOTALPAPERS, worldSize);
 
 
   // vector being used for the powermethod easier than scattering the struct
@@ -159,15 +155,31 @@ int main(int argc, char **argv) {
 
     char *line = NULL; // buffer to read in from the file 
     size_t len; 
+    int numread;
+
     int lineNumber = 0; // line number in the file 
     int totalCited = 0; // # of papers cited by the current paperID 
     int j =0; // iterates thru data array( different lengths for every paper)
-
+    int paperNumber = 0;; // current paper index being read in from file 
 
     // while !EOF
     while ((numread = getline(&line, &len, fp)) != -1) {
       int length = strlen(line);
       line[length-1 ] = 0; 
+      // printf("line =%d %s\n", paperNumber , line);
+
+
+
+      // next line read in will be a paper
+      if (line[0] == '+') {
+        paperNumber++;
+      }
+
+      
+
+        free(line);
+        line = NULL;
+        len = 0;
 
     }
   }
