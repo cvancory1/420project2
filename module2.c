@@ -344,7 +344,7 @@ int main(int argc, char **argv) {
     locallistA[i].globalID = -1;
   }
 
-  free(localLenghts);
+  // free(localLenghts);
 
 
   // updated version 
@@ -495,22 +495,22 @@ if (rank == 0) {
 
 
   //// error checking recv arrays for root , printing the original matrix
-  if (rank == 0) {
-    puts("error checking ");
-    for (int i = 0; i < length_counts.cnts[rank]; i++) {
-      if (locallistA[i].length > 0) {
-        for (int j = 0; j < locallistA[i].length; j++) {
-          // printf("Here rank =%d\n", rank);
-          //  printf("rank =%d i = %d globalID= %d \n",rank,i,
-          //  locallistA[i].data[0]);
-          // printf(" rank = %d  localListIndex=%d totallength = %d  data= %d
-          // \n", rank, i , locallistA[i].length, locallistA[i].data[j]);
-        }
-      } else {
-        // printf("rank =%d  i = %d  ID =NULL \n",rank, i);
-      }
-    }
-  }
+  // if (rank == 0) {
+  //   puts("error checking ");
+  //   for (int i = 0; i < length_counts.cnts[rank]; i++) {
+  //     if (locallistA[i].length > 0) {
+  //       for (int j = 0; j < locallistA[i].length; j++) {
+  //         // printf("Here rank =%d\n", rank);
+  //         //  printf("rank =%d i = %d globalID= %d \n",rank,i,
+  //         //  locallistA[i].data[0]);
+  //         // printf(" rank = %d  localListIndex=%d totallength = %d  data= %d
+  //         // \n", rank, i , locallistA[i].length, locallistA[i].data[j]);
+  //       }
+  //     } else {
+  //       // printf("rank =%d  i = %d  ID =NULL \n",rank, i);
+  //     }
+  //   }
+  // }
 
   /*
 
@@ -581,15 +581,15 @@ if (rank == 0) {
 */
 
   // free all variables
-    for (int i = 0; i < length_counts.cnts[rank]; i++) {
-      if(locallistA[i].data != NULL ) free( locallistA[i].data); 
-  }
+  //   for (int i = 0; i < length_counts.cnts[rank]; i++) {
+  //     if(locallistA[i].data != NULL ) free( locallistA[i].data); 
+  // }
 
-   if(rank == ROOT){
-     for (int i = 0; i < TOTALPAPERS; i++) {
-      free( listA[i].data); 
-    }
-  }
+  //  if(rank == ROOT){
+  //    for (int i = 0; i < TOTALPAPERS; i++) {
+  //     free( listA[i].data); 
+  //   }
+  // }
   // free(X.data);
   // free(Matrixlengths);
   // free(length_counts.cnts);
