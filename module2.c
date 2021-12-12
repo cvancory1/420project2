@@ -161,25 +161,74 @@ int main(int argc, char **argv) {
     int totalCited = 0; // # of papers cited by the current paperID 
     int j =0; // iterates thru data array( different lengths for every paper)
     int paperNumber = 0;; // current paper index being read in from file 
-
+    int checkCitations = 0; // bool 
     // while !EOF
     while ((numread = getline(&line, &len, fp)) != -1) {
       int length = strlen(line);
-      line[length-1 ] = 0; 
+      // line[length-1 ] = 0;  
       // printf("line =%d %s\n", paperNumber , line);
+      // printf("lineNum =%d %c\n", paperNumber , line[0]);
+
+      // reading in a paperid , query db to find its global index 
+     if (checkCitations == 0 && line[0] != '-') {
+        // printf("listA_it =%d %s\n", paperNumber , line);
+        // listA[paperNumber].globalID = rand() % TOTALPAPERS;
+
+      }
+
+      // reading the citations of the paper ( versus paperid)
+      if (checkCitations == 1 && line[0] != '+') {
+      //  puts("here2");
+
+        // citations are being counted for current paper
+        listA[paperNumber].length++;
+        Matrixlengths[paperNumber]++;
+
+        // printf("listA_it =%d %s\n", paperNumber , line);
+
+        line[length - 1] = 0;  // removes the newline
+        // char *stmt = "select ind from Meta where id=";
+        // char *query = malloc(200);
+        // sprintf(query, "%s \'%s\';", stmt, line);
+        // printf("query =%s\n",  query);
+        // printf("count =%d %s\n",paperNumber,  query);
+
+        // query the db NEED CHAGE THIS AFTER WE IMPLEMENT A DIFFERENT STRUCTURE
+        // rc = sqlite3_prepare_v2(db, query, -1, &res, 0);
+        // int step = sqlite3_step(res);
+        // if (step == SQLITE_ROW) {
+        //   // printf("%s\n", sqlite3_column_text(res, 0));
+        // }
+
+        // int returnedIndex = (int)sqlite3_column_int(res, 0);
+
+       
+
+        // switch back
+      }else  if (checkCitations == 1 && line[0] == '+') {
+        checkCitations = 0;
+      }
+
+      // paper has citations so check them on ... nxt line(s) is the list of cited papers
+      if (line[length - 2] == '-' ) {
+
+        checkCitations = 1;  // the next name you read in is a citation
+      //   printf("here =%s subtraction\n", line);
+
+      }
 
 
 
-      // next line read in will be a paper
+
+      // next line read in will be a paper to be read in
       if (line[0] == '+') {
         paperNumber++;
       }
 
-      
 
-        free(line);
-        line = NULL;
-        len = 0;
+      free(line);
+      line = NULL;
+      len = 0;
 
     }
   }
@@ -216,19 +265,12 @@ int main(int argc, char **argv) {
 
 
 
-
 /*
-
-  // does calcs for number of bytes every proc needs to read in based on even
-  //   division of papers 
   if (rank == ROOT) {
     char *line = NULL;
     int numread;
     int curPaperCount = 0;  // index of the current paper we are looking at in the list
 
-    int i = 0;
-    for (i = 0; i < worldSize; i++)
-      sendcnt[i] = 0;  // initalize the sendcounts = 0
 
     int citedCount = 0;  // counts the len of "rows" array
     size_t len = 0;      // used by getline function (gets returned a power of 2
@@ -242,7 +284,7 @@ int main(int argc, char **argv) {
     // while !EOF
     while ((numread = getline(&line, &len, fp)) != -1) {
       int length = strlen(line);
-      sendcnt[i] += numread;  // tracks the total amount of bytes
+      // sendcnt[i] += numread;  // tracks the total amount of bytes
                               // printf("line: %s count: %zu\n", line, len);
 
       // TODO: store the paper id of the paper being read in currently
@@ -255,11 +297,12 @@ int main(int argc, char **argv) {
         char *stmt = "select ind from Meta where id=";
         char *query = malloc(200);
         sprintf(query, "%s \'%s\';", stmt, line);
+        printf("query current=%s\n", query);
 
         rc = sqlite3_prepare_v2(db, query, -1, &res, 0);
         int step = sqlite3_step(res);
         // if (step == SQLITE_ROW) {
-        //   // printf("%s\n", sqlite3_column_text(res, 0));
+          // printf("%s\n", sqlite3_column_text(res, 0));
         // }
 
         // UNCOMMENT THIS ON REAL TEST CASE
@@ -321,13 +364,13 @@ int main(int argc, char **argv) {
         curPaperCount++;
         listA_it++;
 
-        if (curPaperCount == localPapercount[i]) {
-          // printf("citedCount=%d \n", citedCount);
-          citedCount = 0;  // resets the cited count
+        // if (curPaperCount == localPapercount[i]) {
+        //   // printf("citedCount=%d \n", citedCount);
+        //   citedCount = 0;  // resets the cited count
 
-          i++;
-          curPaperCount = 0;
-        }
+        //   i++;
+        //   curPaperCount = 0;
+        // }
       }
 
       free(line);
@@ -340,9 +383,9 @@ int main(int argc, char **argv) {
       }
     }
   }
+*/
 
-
-
+/*
 
   //  printing results of the sparse matrix in listA 
   // if (rank == ROOT) {
