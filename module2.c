@@ -162,31 +162,47 @@ int main(int argc, char **argv) {
     int j =0; // iterates thru data array( different lengths for every paper)
     int paperNumber = 0;; // current paper index being read in from file 
     int checkCitations = 0; // bool 
+  
     // while !EOF
     while ((numread = getline(&line, &len, fp)) != -1) {
       int length = strlen(line);
-      // line[length-1 ] = 0;  
       // printf("line =%d %s\n", paperNumber , line);
-      // printf("lineNum =%d %c\n", paperNumber , line[0]);
 
       // reading in a paperid , query db to find its global index 
      if (checkCitations == 0 && line[0] != '-') {
-        // printf("listA_it =%d %s\n", paperNumber , line);
-        // listA[paperNumber].globalID = rand() % TOTALPAPERS;
+        // printf("listA_it =%d %s\n", listA_it , line);
+
+        line[length - 1] = 0;  // removes the newline
+        char *stmt = "select ind from Meta where id=";
+        char *query = malloc(200);
+        sprintf(query, "%s \'%s\';", stmt, line);
+        printf("paperID query=%s\n", query);
+
+        rc = sqlite3_prepare_v2(db, query, -1, &res, 0);
+        int step = sqlite3_step(res);
+        // if (step == SQLITE_ROW) {
+          // printf("%s\n", sqlite3_column_text(res, 0));
+        // }
+        // UNCOMMENT THIS ON REAL TEST CASE
+         listA[paperNumber].globalID = (int)sqlite3_column_int(res, 0);
+
+        // TEMPTEST
+        // listA[listA_it].globalID = rand() % TOTALPAPERS;
 
       }
 
       // reading the citations of the paper ( versus paperid)
       if (checkCitations == 1 && line[0] != '+') {
-      //  puts("here2");
-
-        // citations are being counted for current paper
+        // track number of citations this paperID has
         listA[paperNumber].length++;
         Matrixlengths[paperNumber]++;
 
         // printf("listA_it =%d %s\n", paperNumber , line);
-
+    
         line[length - 1] = 0;  // removes the newline
+
+        // query db to find the globalindex 
+
         // char *stmt = "select ind from Meta where id=";
         // char *query = malloc(200);
         // sprintf(query, "%s \'%s\';", stmt, line);
@@ -202,22 +218,15 @@ int main(int argc, char **argv) {
 
         // int returnedIndex = (int)sqlite3_column_int(res, 0);
 
-       
-
-        // switch back
+        // switch back - reading in a regular papernot citations
       }else  if (checkCitations == 1 && line[0] == '+') {
         checkCitations = 0;
       }
 
       // paper has citations so check them on ... nxt line(s) is the list of cited papers
       if (line[length - 2] == '-' ) {
-
         checkCitations = 1;  // the next name you read in is a citation
-      //   printf("here =%s subtraction\n", line);
-
       }
-
-
 
 
       // next line read in will be a paper to be read in
