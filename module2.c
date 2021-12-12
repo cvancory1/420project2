@@ -215,6 +215,11 @@ int main(int argc, char **argv) {
         }
 
         int returnedIndex = (int)sqlite3_column_int(res, 0);
+        // printf("query =%s\n",  query);
+
+        int dataIT = listA[paperNumber].length - 1;
+        listA[paperNumber].data[dataIT] = returnedIndex;
+
 
         // switch back - reading in a regular papernot citations
       }else  if (checkCitations == 1 && line[0] == '+') {
