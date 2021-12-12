@@ -340,7 +340,6 @@ int main(int argc, char **argv) {
     locallistA[i].globalID = -1;
   }
 
-/*
 
 
   // updated version 
@@ -421,6 +420,7 @@ if (rank == 0) {
 
 
 
+/*
 
   // part of the old version be careful 
 
