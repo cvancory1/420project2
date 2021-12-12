@@ -235,6 +235,11 @@ int main(int argc, char **argv) {
       // next line read in will be a paper to be read in
       if (line[0] == '+') {
         //TODO check here for the length.. if 0 then realloc set to null 
+        if(  listA[paperNumber].length == 0 ){
+          free( listA[paperNumber].data);
+          listA[paperNumber].data = NULL;
+
+        }
         paperNumber++;
          
       }
@@ -359,7 +364,7 @@ if (rank == 0) {
 
 
     // send the sparisfied  list except for what the root will receive which will be handled later 
-    for (int i = length_counts.cnts[ROOT]; i < TOTALPAPERS ; i++) {
+    for ( i = length_counts.cnts[ROOT]; i < TOTALPAPERS ; i++) {
       for (int j = 0; j < listA[i].length; j++) {
         // printf("list i=%d j=%d arr= %d \n", i, j , listA[i].data[j]);
       }
@@ -399,12 +404,10 @@ if (rank == 0) {
     for (i = 0; i < length_counts.cnts[rank]; i++) {
       MPI_Status status;
 
-      // MPI_Recv(locallistA[i].data, localLenghts[i], MPI_INT, ROOT, MPI_ANY_TAG,
-      //           world, &status);
        MPI_Recv(locallistA[i].data, locallistA[i].length, MPI_INT, ROOT, MPI_ANY_TAG,
                 world, &status);
 
-      MPI_Get_count(&status, MPI_INT, &number_amount);
+      // MPI_Get_count(&status, MPI_INT, &number_amount);
       // printf(
           // "received %d numbers from 0. Message source = %d, "
           // "tag = %d\n",
@@ -455,9 +458,6 @@ if (rank == 0) {
       }
     }
   }
-
-
-
 
   MPI_Barrier(world);
   // puts("=======");
