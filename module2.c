@@ -327,7 +327,6 @@ int main(int argc, char **argv) {
     // printf("rank =%d arr=%d i=%d \n", rank, localLenghts[i], i);
   }
 
-/*
   // allocate local adjacency list and malloc arrays based off of lengths in 1's
   AdjacenyList *locallistA = malloc(length_counts.cnts[rank] * sizeof(AdjacenyList));
   for (int i = 0; i < length_counts.cnts[rank]; i++) {
@@ -341,6 +340,7 @@ int main(int argc, char **argv) {
     locallistA[i].globalID = -1;
   }
 
+/*
 
 
   // updated version 
