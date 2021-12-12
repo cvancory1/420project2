@@ -188,6 +188,7 @@ int main(int argc, char **argv) {
 
         // TEMPTEST
         // listA[listA_it].globalID = rand() % TOTALPAPERS;
+        free(query);
 
       }
 
@@ -215,13 +216,15 @@ int main(int argc, char **argv) {
         }
 
         int returnedIndex = (int)sqlite3_column_int(res, 0);
-        // printf("query =%s\n",  query);
+        // printf(" paperNumber =%d query =%s\n", paperNumber, query);
 
+        // counting number of citations it has as we read through the file 
+        // so using that index assign the globalindex from the db 
         int dataIT = listA[paperNumber].length - 1;
         listA[paperNumber].data[dataIT] = returnedIndex;
 
-
-        // switch back - reading in a regular papernot citations
+        free(query);
+        // switch back - reading in a regular paper not citations
       }else  if (checkCitations == 1 && line[0] == '+') {
         checkCitations = 0;
       }
@@ -235,6 +238,7 @@ int main(int argc, char **argv) {
       // next line read in will be a paper to be read in
       if (line[0] == '+') {
         paperNumber++;
+         
       }
 
 
