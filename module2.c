@@ -235,11 +235,11 @@ int main(int argc, char **argv) {
       // next line read in will be a paper to be read in
       if (line[0] == '+') {
         //TODO check here for the length.. if 0 then realloc set to null 
-        if(  listA[paperNumber].length == 0 ){
-          free( listA[paperNumber].data);
-          listA[paperNumber].data = NULL;
+        // if(  listA[paperNumber].length == 0 ){
+        //   free( listA[paperNumber].data);
+        //   listA[paperNumber].data = NULL;
 
-        }
+        // }
         paperNumber++;
          
       }
@@ -591,9 +591,9 @@ if (rank == 0) {
     }
   }
   // free(X.data);
-  free(Matrixlengths);
-  free(length_counts.cnts);
-  free(length_counts.displs);
+  // free(Matrixlengths);
+  // free(length_counts.cnts);
+  // free(length_counts.displs);
 
 
 
