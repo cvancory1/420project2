@@ -265,7 +265,7 @@ int main(int argc, char **argv) {
     for (i = 0; i < length_counts.cnts[rank]; i++) {
       MPI_Status status;
 
-      MPI_Recv(locallistA[i].data, localLenghts[i], MPI_INT, ROOT, MPI_ANY_TAG,
+      MPI_Recv(locallistA[i].data, locallistA[i].length, MPI_INT, ROOT, MPI_ANY_TAG,
                 world, &status);
 
       MPI_Get_count(&status, MPI_INT, &number_amount);
@@ -314,6 +314,8 @@ int main(int argc, char **argv) {
   // TODO include the lab4 case in this folder
 
 
+
+  // free all data 
   for (int i = 0; i < length_counts.cnts[rank]; i++) {
       if(locallistA[i].data != NULL ) free( locallistA[i].data); 
   }
@@ -332,9 +334,6 @@ int main(int argc, char **argv) {
   free(length_counts.cnts);
   free(length_counts.displs);
   free(localLenghts);
-
- 
-
   
  
   free(locallistA);
