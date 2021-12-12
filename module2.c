@@ -190,7 +190,7 @@ int main(int argc, char **argv) {
       // reading the citations of the paper ( versus paperid)
       if (checkCitations == 1 && line[0] != '+') {
         // track number of citations this paperID has
-        listA[paperNumber].length++;
+        // listA[paperNumber].length++;
         Matrixlengths[paperNumber]++;
 
         // printf("listA_it =%d %s\n", paperNumber , line);
@@ -592,6 +592,8 @@ if (rank == 0) {
   }
   // free(X.data);
   free(Matrixlengths);
+  free(length_counts.cnts);
+  free(length_counts.displs);
 
 
 
