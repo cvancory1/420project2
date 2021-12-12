@@ -282,20 +282,20 @@ int main(int argc, char **argv) {
 
 
   //  printing results of the sparse matrix in listA 
-  if (rank == ROOT) {
-    for (int i = 0; i < TOTALPAPERS; i++) {
-      // print global id and number of 1's in the list
-      // printf("i=%d listA.length= %d globalID=%d \n", i, listA[i].length,listA[i].globalID  );
+  // if (rank == ROOT) {
+  //   for (int i = 0; i < TOTALPAPERS; i++) {
+  //     // print global id and number of 1's in the list
+  //     // printf("i=%d listA.length= %d globalID=%d \n", i, listA[i].length,listA[i].globalID  );
 
-      if(listA[i].length>0){
-        for (int j = 0; j < listA[i].length; j++) {
-          // printf("  onesLocation=%d \n",  listA[i].data[j] );
+  //     if(listA[i].length>0){
+  //       for (int j = 0; j < listA[i].length; j++) {
+  //         // printf("  onesLocation=%d \n",  listA[i].data[j] );
 
-        }
-      }
-    }
-    // puts("");
-  }
+  //       }
+  //     }
+  //   }
+  //   // puts("");
+  // }
 
 
 
@@ -325,11 +325,12 @@ int main(int argc, char **argv) {
     // printf("rank =%d arr=%d i=%d \n", rank, localLenghts[i], i);
   }
 
-  // allocate local adjacency list and malloc arrays based off of lengths in 1's
+  // create local sparse matric 
   AdjacenyList *locallistA = malloc(length_counts.cnts[rank] * sizeof(AdjacenyList));
   for (int i = 0; i < length_counts.cnts[rank]; i++) {
     locallistA[i].length = localLenghts[i];
 
+    // if papers were cited , allocate space
     if (locallistA[i].length > 0) {
       locallistA[i].data = malloc(localLenghts[i] * sizeof(int));
     } else {
@@ -338,6 +339,7 @@ int main(int argc, char **argv) {
     locallistA[i].globalID = -1;
   }
 
+  free(localLenghts);
 
 
   // updated version 
@@ -598,6 +600,48 @@ if (rank == 0) {
 
   return 0;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
