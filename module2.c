@@ -587,6 +587,7 @@ if (rank == 0) {
     }
   }
   // free(X.data);
+  free(Matrixlengths);
 
 
 
@@ -597,6 +598,33 @@ if (rank == 0) {
 
   return 0;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
