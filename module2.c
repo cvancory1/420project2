@@ -172,11 +172,11 @@ int main(int argc, char **argv) {
      if (checkCitations == 0 && line[0] != '-') {
         // printf("listA_it =%d %s\n", listA_it , line);
 
-        line[length - 1] = 0;  // removes the newline
+        line[length - 1] = 0;  // removes the newline  for query
         char *stmt = "select ind from Meta where id=";
         char *query = malloc(200);
         sprintf(query, "%s \'%s\';", stmt, line);
-        printf("paperID query=%s\n", query);
+        // printf("paperID query=%s\n", query); 
 
         rc = sqlite3_prepare_v2(db, query, -1, &res, 0);
         int step = sqlite3_step(res);
@@ -199,24 +199,22 @@ int main(int argc, char **argv) {
 
         // printf("listA_it =%d %s\n", paperNumber , line);
     
-        line[length - 1] = 0;  // removes the newline
+        line[length - 1] = 0;  // removes the newline for query
 
-        // query db to find the globalindex 
-
-        // char *stmt = "select ind from Meta where id=";
-        // char *query = malloc(200);
-        // sprintf(query, "%s \'%s\';", stmt, line);
-        // printf("query =%s\n",  query);
+        // query db to find the globalindex for the citations
+        char *stmt = "select ind from Meta where id=";
+        char *query = malloc(200);
+        sprintf(query, "%s \'%s\';", stmt, line);
         // printf("count =%d %s\n",paperNumber,  query);
 
         // query the db NEED CHAGE THIS AFTER WE IMPLEMENT A DIFFERENT STRUCTURE
-        // rc = sqlite3_prepare_v2(db, query, -1, &res, 0);
-        // int step = sqlite3_step(res);
-        // if (step == SQLITE_ROW) {
-        //   // printf("%s\n", sqlite3_column_text(res, 0));
-        // }
+        rc = sqlite3_prepare_v2(db, query, -1, &res, 0);
+        int step = sqlite3_step(res);
+        if (step == SQLITE_ROW) {
+          // printf("%s\n", sqlite3_column_text(res, 0));
+        }
 
-        // int returnedIndex = (int)sqlite3_column_int(res, 0);
+        int returnedIndex = (int)sqlite3_column_int(res, 0);
 
         // switch back - reading in a regular papernot citations
       }else  if (checkCitations == 1 && line[0] == '+') {
