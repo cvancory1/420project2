@@ -212,7 +212,7 @@ int main(int argc, char **argv) {
         rc = sqlite3_prepare_v2(db, query, -1, &res, 0);
         int step = sqlite3_step(res);
         if (step == SQLITE_ROW) {
-          printf("%s\n", sqlite3_column_text(res, 0));
+          printf("query return %s\n", sqlite3_column_text(res, 0));
         }
 
         int returnedIndex = (int)sqlite3_column_int(res, 0);
@@ -224,6 +224,8 @@ int main(int argc, char **argv) {
         listA[paperNumber].data[dataIT] = returnedIndex;
 
         free(query);
+
+        
         // switch back - reading in a regular paper not citations
       }else  if (checkCitations == 1 && line[0] == '+') {
         checkCitations = 0;
@@ -291,12 +293,12 @@ int main(int argc, char **argv) {
 
       if(listA[i].length>0){
         for (int j = 0; j < listA[i].length; j++) {
-          printf("  onesLocation=%d \n",  listA[i].data[j] );
+          // printf("  onesLocation=%d \n",  listA[i].data[j] );
 
         }
       }
     }
-    puts("");
+    // puts("");
   }
 
 
@@ -403,13 +405,13 @@ if (rank == 0) {
                 world, &status);
 
       MPI_Get_count(&status, MPI_INT, &number_amount);
-      printf(
-          "received %d numbers from 0. Message source = %d, "
-          "tag = %d\n",
-          number_amount, status.MPI_SOURCE, status.MPI_TAG);
+      // printf(
+          // "received %d numbers from 0. Message source = %d, "
+          // "tag = %d\n",
+          // number_amount, status.MPI_SOURCE, status.MPI_TAG);
     }
 
-    puts("");
+    // puts("");
 
   }
 
@@ -481,22 +483,36 @@ if (rank == 0) {
     // %d\n", temp_amount, status.MPI_SOURCE, status.MPI_TAG);
   }
 
-  //// error checking recv arrays , printing the original matrix
+
+*/
+
+
+
+
+
+
+
+
+
+  //// error checking recv arrays for root , printing the original matrix
   if (rank == 0) {
+    puts("error checking ");
     for (int i = 0; i < length_counts.cnts[rank]; i++) {
       if (locallistA[i].length > 0) {
         for (int j = 0; j < locallistA[i].length; j++) {
           // printf("Here rank =%d\n", rank);
-          //  printf("rank =%d i = %d arr= %d \n",rank,i,
+          //  printf("rank =%d i = %d globalID= %d \n",rank,i,
           //  locallistA[i].data[0]);
           // printf(" rank = %d  localListIndex=%d totallength = %d  data= %d
           // \n", rank, i , locallistA[i].length, locallistA[i].data[j]);
         }
       } else {
-        // printf("rank =%d  i = %d  arr=NULL \n",rank, i);
+        // printf("rank =%d  i = %d  ID =NULL \n",rank, i);
       }
     }
   }
+
+  /*
 
   // for testing- print actal matrix
   if (rank == 0) {
