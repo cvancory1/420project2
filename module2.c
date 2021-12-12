@@ -207,7 +207,7 @@ int main(int argc, char **argv) {
         rc = sqlite3_prepare_v2(db, query, -1, &res, 0);
         int step = sqlite3_step(res);
         if (step == SQLITE_ROW) {
-          printf("query return %s\n", sqlite3_column_text(res, 0));
+          // printf("query return %s\n", sqlite3_column_text(res, 0));
         }
 
         int returnedIndex = (int)sqlite3_column_int(res, 0);
@@ -215,7 +215,9 @@ int main(int argc, char **argv) {
 
         // counting number of citations it has as we read through the file 
         // so using that index assign the globalindex from the db 
-        int dataIT = listA[paperNumber].length - 1;
+        int dataIT = Matrixlengths[paperNumber]-1;
+          printf("dataIT %d\n",dataIT);
+
         listA[paperNumber].data[dataIT] = returnedIndex;
 
         free(query);
@@ -405,11 +407,11 @@ if (rank == 0) {
        MPI_Recv(locallistA[i].data, localLenghts[i], MPI_INT, ROOT, MPI_ANY_TAG,
                 world, &status);
 
-      // MPI_Get_count(&status, MPI_INT, &number_amount);
-      // printf(
-          // "received %d numbers from 0. Message source = %d, "
-          // "tag = %d\n",
-          // number_amount, status.MPI_SOURCE, status.MPI_TAG);
+      MPI_Get_count(&status, MPI_INT, &number_amount);
+      printf(
+          "received %d numbers from 0. Message source = %d, "
+          "tag = %d\n",
+          number_amount, status.MPI_SOURCE, status.MPI_TAG);
     }
 
     // puts("");
