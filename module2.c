@@ -312,7 +312,7 @@ int main(int argc, char **argv) {
 
   // //  allocate to recv the number of 1's for each row ... will be used to  malloc later
   int *localLenghts = malloc(sizeof(int) * length_counts.cnts[rank]);
-/*
+
   // scattering the lengths
   MPI_Scatterv(Matrixlengths,             // sendbuf
                length_counts.cnts,        // sendcnts
@@ -327,7 +327,7 @@ int main(int argc, char **argv) {
     // printf("rank =%d arr=%d i=%d \n", rank, localLenghts[i], i);
   }
 
-
+/*
   // allocate local adjacency list and malloc arrays based off of lengths in 1's
   AdjacenyList *locallistA = malloc(length_counts.cnts[rank] * sizeof(AdjacenyList));
   for (int i = 0; i < length_counts.cnts[rank]; i++) {
