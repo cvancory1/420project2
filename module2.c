@@ -115,32 +115,27 @@ int main(int argc, char **argv) {
 
 
 
-  // vector being used for the powermethod easier than scattering the struct
-  // Matrix Matrixlengths;
-  // Matrixlengths.rows = TOTALPAPERS;
-  // Matrixlengths.cols = 1;
 
-  int *Matrixlengths;
-  // // printf("      rank=%d rows =%d \n", rank,  Matrixlengths.rows);
-
-  // initialize & allocate listA for power method
-  //  assume there are at least 10 citations and allocate, if more than
-  // reallocate later 
-
-  // vector for powermethod, only stores the lengths
+  // allocate  sparse Matrix structure 
   AdjacenyList *listA = malloc(TOTALPAPERS * 2 * sizeof(int) * sizeof(int *));
-
+  int * Matrixlengths; // will be used for scattering later
   int MALLOCEDSIZE = 10;
+  
   if (rank == ROOT) {
+    // assume a paper might have at least 10 papers cited( high estimate)
+    // gets realloced later... 
     Matrixlengths = malloc(TOTALPAPERS * sizeof(int));
+    
+    //if we run out of memory 
     if (Matrixlengths == NULL) {
       printf("error malloc matrixlengths");
       return 1;
     }
 
+    // initalize data 
     for (int i = 0; i < TOTALPAPERS; i++) {
       listA[i].data = malloc(MALLOCEDSIZE * sizeof(int));
-      listA[i].length = 0;
+      listA[i].length = 0; 
       listA[i].globalID = -1;
       Matrixlengths[i] = 0;
     }
@@ -225,7 +220,7 @@ int main(int argc, char **argv) {
 
         free(query);
 
-        
+
         // switch back - reading in a regular paper not citations
       }else  if (checkCitations == 1 && line[0] == '+') {
         checkCitations = 0;
@@ -239,6 +234,7 @@ int main(int argc, char **argv) {
 
       // next line read in will be a paper to be read in
       if (line[0] == '+') {
+        //TODO check here for the length.. if 0 then realloc set to null 
         paperNumber++;
          
       }
@@ -579,6 +575,23 @@ if (rank == 0) {
   // }
 
 */
+
+  // free all variables
+    for (int i = 0; i < length_counts.cnts[rank]; i++) {
+      if(locallistA[i].data != NULL ) free( locallistA[i].data); 
+  }
+
+   if(rank == ROOT){
+     for (int i = 0; i < TOTALPAPERS; i++) {
+      free( listA[i].data); 
+    }
+  }
+  // free(X.data);
+
+
+
+
+
   sqlite3_close(db);
   MPI_Finalize();
 
