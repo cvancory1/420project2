@@ -344,8 +344,6 @@ int main(int argc, char **argv) {
     locallistA[i].globalID = -1;
   }
 
-  // free(localLenghts);
-
 
   // updated version 
 
@@ -404,7 +402,7 @@ if (rank == 0) {
     for (i = 0; i < length_counts.cnts[rank]; i++) {
       MPI_Status status;
 
-       MPI_Recv(locallistA[i].data, locallistA[i].length, MPI_INT, ROOT, MPI_ANY_TAG,
+       MPI_Recv(locallistA[i].data, localLenghts[i], MPI_INT, ROOT, MPI_ANY_TAG,
                 world, &status);
 
       // MPI_Get_count(&status, MPI_INT, &number_amount);
