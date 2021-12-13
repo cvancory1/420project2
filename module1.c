@@ -195,8 +195,8 @@ int main(int argc, char** argv) {
 
 
 
-	//fp = fopen("example.txt", "r");
-	fp = fopen("chloe.txt", "r");
+	fp = fopen("example.txt", "r");
+	//fp = fopen("chloe.txt", "r");
 
 	int count = 0;
 	int index = 0;
@@ -350,7 +350,7 @@ int main(int argc, char** argv) {
 
 	//printf("%s\nrank %d\n", words, rank);
 	//
-	//printf("word length %d\n", strlen(words));
+	//printf("word length %d and sum %d\n", strlen(words), sum);
 
 	//unsigned long long *sizes = NULL;
 	int *sizes = NULL;
@@ -358,6 +358,8 @@ int main(int argc, char** argv) {
 		//sizes = malloc(sizeof(unsigned long long)*worldSize);
 		sizes = malloc(sizeof(int)*worldSize);
 	}
+
+	sum = strlen(words);
 	
 	MPI_Gather(
 		&sum,
@@ -389,7 +391,8 @@ int main(int argc, char** argv) {
 			}
 		}
 		combinedWords = malloc(total*sizeof(char));
-		memset(combinedWords, '\0', total);
+		memset(combinedWords, '#', total);
+		combinedWords[total-2] = '\0';
 	}
 
 	printf("total: %d and sum %d and rank %d\n", total, sum, rank);
@@ -406,7 +409,7 @@ int main(int argc, char** argv) {
 		world		
 	);
 
-	if (rank == 0) printf("COMBINED WORDS: %s and size %d\n", combinedWords, strlen(combinedWords));
+	//if (rank == 0) printf("COMBINED WORDS: %s and size %d\n", combinedWords, strlen(combinedWords));
 
 	list_init(&mylist);
 
@@ -431,14 +434,14 @@ int main(int argc, char** argv) {
 			//printf("%s\n", strlen(((char*)data)));
 			//printf("%s = %d\n", ((char *)data), strlen(data));
 			//
-			//printf("%s ", ((char *)data));
+			printf("%s ", ((char *)data));
 			
 			//printf("LENGTH: %d\n", strlen(data));
 		}
 		list_iterator_stop(&mylist);
 		
 		unsigned int combSize = list_size(&mylist);
-		//printf("\nSIZE: %u\n", combSize);
+		printf("\nSIZE: %u\n", combSize);
 	}
 
 	if (rank == 0) {
