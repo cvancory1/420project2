@@ -348,9 +348,9 @@ int main(int argc, char** argv) {
 	list_destroy(&mylist);
 
 
-	printf("%s\nrank %d\n", words, rank);
+	//printf("%s\nrank %d\n", words, rank);
 	//
-	//printf("%d\n", strlen(words));
+	//printf("word length %d\n", strlen(words));
 
 	//unsigned long long *sizes = NULL;
 	int *sizes = NULL;
@@ -381,14 +381,14 @@ int main(int argc, char** argv) {
 		displChar[0] = 0;
 		for (int i = 0; i < worldSize; i++) {
 			//printf("%llu ", sizes[i]);
-			//printf("sizes: %d ", sizes[i]);
-			total += sizes[i];
+		//	printf("sizes: %d ", sizes[i]);
+			total += sizes[i]+1;
 			if (i > 0) {
-				displChar[i] = displChar[i-1] + sizes[i];
-				printf("%d ", displChar[i]);
+				displChar[i] = displChar[i-1] + sizes[i-1] + 1;
+				//printf("%d ", displChar[i]);
 			}
 		}
-		combinedWords = malloc(total);
+		combinedWords = malloc(total*sizeof(char));
 		memset(combinedWords, '\0', total);
 	}
 
@@ -396,7 +396,7 @@ int main(int argc, char** argv) {
 	//MPI_Barrier(world);
 	MPI_Gatherv(
 		words,
-		109,
+		sum,
 		MPI_CHAR,
 		combinedWords,
 		sizes,
@@ -431,14 +431,14 @@ int main(int argc, char** argv) {
 			//printf("%s\n", strlen(((char*)data)));
 			//printf("%s = %d\n", ((char *)data), strlen(data));
 			//
-			printf("%s ", ((char *)data));
+			//printf("%s ", ((char *)data));
 			
 			//printf("LENGTH: %d\n", strlen(data));
 		}
 		list_iterator_stop(&mylist);
 		
 		unsigned int combSize = list_size(&mylist);
-		printf("\nSIZE: %u\n", combSize);
+		//printf("\nSIZE: %u\n", combSize);
 	}
 
 	if (rank == 0) {
