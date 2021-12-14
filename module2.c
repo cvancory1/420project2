@@ -511,7 +511,7 @@ if (rank == 0) {
   //   }
   // }
 
-  /*
+  
 
   // for testing- print actal matrix
   if (rank == 0) {
@@ -546,9 +546,9 @@ if (rank == 0) {
 
   // sending matrix lengths into the power method
   double e = 10E-16;
-  // Matrix pageRanks = newpowermethod(locallistA, X, length_counts.cnts[rank],
-  // TOTALPAPERS, 6, e ); printf("IN MAIN rank=%d pointer=%p\n", rank, X.data);
-  // newpowermethod(locallistA, X, length_counts.cnts[rank], TOTALPAPERS, 10, e);
+  // Matrix pageRanks = newpowermethod(locallistA, X, length_counts.cnts[rank], TOTALPAPERS, 6, e ); 
+  // printf("IN MAIN rank=%d pointer=%p\n", rank, X.data);
+  // newpowermethod(locallistA, X, length_counts.cnts[rank], TOTALPAPERS, 5, e);
 
   // puts("outside powermethod ");
   if (rank == ROOT) {
@@ -577,22 +577,22 @@ if (rank == 0) {
   //   free(query);
   // }
 
-*/
+
 
   // free all variables
-  //   for (int i = 0; i < length_counts.cnts[rank]; i++) {
-  //     if(locallistA[i].data != NULL ) free( locallistA[i].data); 
-  // }
+    for (int i = 0; i < length_counts.cnts[rank]; i++) {
+      if(locallistA[i].data != NULL ) free( locallistA[i].data); 
+  }
 
-  //  if(rank == ROOT){
-  //    for (int i = 0; i < TOTALPAPERS; i++) {
-  //     free( listA[i].data); 
-  //   }
-  // }
-  // free(X.data);
-  // free(Matrixlengths);
-  // free(length_counts.cnts);
-  // free(length_counts.displs);
+   if(rank == ROOT){
+     for (int i = 0; i < TOTALPAPERS; i++) {
+      free( listA[i].data); 
+    }
+  }
+  free(X.data);
+  free(Matrixlengths);
+  free(length_counts.cnts);
+  free(length_counts.displs);
 
 
 
