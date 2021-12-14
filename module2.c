@@ -402,8 +402,8 @@ if (rank == 0) {
       if (locallistA[i].length > 0) {
         for (int j = 0; j < locallistA[i].length; j++) {
           // printf("Here rank =%d\n", rank);
-          //  printf("rank =%d i = %d globalID= %d \n",rank,i,
-          //  locallistA[i].data[0]);
+           printf("rank =%d i = %d globalID= %d \n",rank,i,
+           locallistA[i].data[0]);
           // printf(" rank = %d  localListIndex=%d totallength = %d  data= %d
           // \n", rank, i , locallistA[i].length, locallistA[i].data[j]);
         }
