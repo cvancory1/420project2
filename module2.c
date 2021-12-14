@@ -408,7 +408,7 @@ if (rank == 0) {
           // \n", rank, i , locallistA[i].length, locallistA[i].data[j]);
         }
       } else {
-        // printf("rank =%d  i = %d  ID =NULL \n",rank, i);
+        printf("rank =%d  i = %d  ID =NULL \n",rank, i);
       }
     }
   }
