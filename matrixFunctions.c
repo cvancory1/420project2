@@ -331,7 +331,7 @@ double powerMethod(Matrix A, Matrix X, int originalRows,int originalCols , int i
 void newpowermethod(AdjacenyList * listA, Matrix  X, int localListSize, int TOTALLISTSIZE, int iterationNum , double epsilon ){
   // printf("ENTER rank =%d localListSize=%d\n", rank, localListSize);
   // if(rank ==0 ) printf("rows=%d cols=%d\n", X.rows, X.cols);
-    printf("=%p \n", X.data);
+    // printf("=%p \n", X.data);
 
 
   // for every row of the adcaceny list needs to calculate the sum then that gets returned back to 
@@ -369,9 +369,12 @@ void newpowermethod(AdjacenyList * listA, Matrix  X, int localListSize, int TOTA
       for(int j = 0 ; j < listA[i].length; j++){
         // printf("length=%d listA[%d].data=%d \n",listA[i].length , i , listA[i].data[j] );
         int xlocation = listA[i].data[j];
+        if(xlocation > X.rows){
+          printf("chloe seg fault will happen on this test case\n");
+          return ;
+        }
         xsub.data[i] += X.data[xlocation];
-
-        // printf("rank =%d xlocation=%d adjIndex[%d] =%d X.data[xlocation]=%f xsub.data=%f\n",rank,  xlocation, i, listA[i].data[j],  X.data[xlocation], xsub.data[i]);
+        printf("rank =%d xlocation=%d adjIndex[%d] =%d X.data[xlocation]=%f xsub.data=%f\n",rank,  xlocation, i, listA[i].data[j],  X.data[xlocation], xsub.data[i]);
       }
       // puts("");
       // printf("FINAL xsub.data[%d] =%f\n", i , xsub.data[i]);
@@ -421,10 +424,10 @@ void newpowermethod(AdjacenyList * listA, Matrix  X, int localListSize, int TOTA
         }
     }else if(count == iterationNum || E < epsilon) {
       // return X; 
-      puts(" ------- ");
-      printf("Count = %d Printing X:\n", count);
-      printMatrix(X);
-      puts(" ------- ");
+      // puts(" ------- ");
+      // printf("Count = %d Printing X:\n", count);
+      // printMatrix(X);
+      // puts(" ------- ");
      
     }
 

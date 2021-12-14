@@ -443,7 +443,7 @@ if (rank == 0) {
 
   // sending matrix lengths into the power method
   double e = 10E-16;
-  // newpowermethod(locallistA, X, length_counts.cnts[rank], TOTALPAPERS, 5, e);
+  newpowermethod(locallistA, X, length_counts.cnts[rank], TOTALPAPERS, 5, e);
 
   // puts("outside powermethod ");
   if (rank == ROOT) {
