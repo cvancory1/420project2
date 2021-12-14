@@ -101,14 +101,14 @@ int main(int argc, char **argv) {
 
   // opens the citation file
   FILE *fp;
-  fp = fopen("testCitations.txt", "r");
-  int TOTALPAPERS = 50; // number of rows in the adjacenylist
+  // fp = fopen("testCitations.txt", "r");
+  // int TOTALPAPERS = 50; // number of rows in the adjacenylist
 
   // fp = fopen("testCitations2.txt", "r");
   // int TOTALPAPERS = 295;  // number of rows in the adjacenylist
 
-  // int TOTALPAPERS = 1354753;
-  // fp = fopen("arxiv-citations.txt", "r");
+  int TOTALPAPERS = 1354753;
+  fp = fopen("arxiv-citations.txt", "r");
 
   if (fp == NULL) printf("ERROR opening file ");
 
@@ -215,7 +215,7 @@ int main(int argc, char **argv) {
         // counting number of citations it has as we read through the file 
         // so using that index assign the globalindex from the db 
         int dataIT = Matrixlengths[paperNumber]-1;
-          printf("dataIT %d\n",dataIT);
+        // printf("dataIT %d\n",dataIT);
 
         listA[paperNumber].data[dataIT] = returnedIndex;
 
@@ -244,6 +244,10 @@ int main(int argc, char **argv) {
         paperNumber++;
          
       }
+
+      // if(paperNumber % 100000 == 0){
+      //   printf("papernumber =%d\n", paperNumber);
+      // }
 
 
       free(line);
