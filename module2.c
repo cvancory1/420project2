@@ -101,14 +101,14 @@ int main(int argc, char **argv) {
 
   // opens the citation file
   FILE *fp;
-  // fp = fopen("testCitations.txt", "r");
-  // int TOTALPAPERS = 50; // number of rows in the adjacenylist
+  fp = fopen("testCitations.txt", "r");
+  int TOTALPAPERS = 50; // number of rows in the adjacenylist
 
   // fp = fopen("testCitations2.txt", "r");
   // int TOTALPAPERS = 295;  // number of rows in the adjacenylist
 
-  int TOTALPAPERS = 1354753;
-  fp = fopen("arxiv-citations.txt", "r");
+  // int TOTALPAPERS = 1354753;
+  // fp = fopen("arxiv-citations.txt", "r");
 
   if (fp == NULL) printf("ERROR opening file ");
 
@@ -217,7 +217,9 @@ int main(int argc, char **argv) {
         int dataIT = Matrixlengths[paperNumber]-1;
         // printf("dataIT %d\n",dataIT);
 
-        listA[paperNumber].data[dataIT] = returnedIndex;
+        ///TODO UNCOPY ERROR 
+        // listA[paperNumber].data[dataIT] = returnedIndex;
+        listA[paperNumber].data[dataIT] = paperNumber;
 
         free(query);
 
@@ -261,20 +263,20 @@ int main(int argc, char **argv) {
 
 
   //  DEBUG - printing results of the sparse matrix in listA 
-  // if (rank == ROOT) {
-  //   for (int i = 0; i < TOTALPAPERS; i++) {
-  //     // print global id and number of 1's in the list
-  //     // printf("i=%d listA.length= %d globalID=%d \n", i, listA[i].length,listA[i].globalID  );
+  if (rank == ROOT) {
+    for (int i = 0; i < TOTALPAPERS; i++) {
+      // print global id and number of 1's in the list
+      // printf("i=%d listA.length= %d globalID=%d \n", i, listA[i].length,listA[i].globalID  );
 
-  //     if(listA[i].length>0){
-  //       for (int j = 0; j < listA[i].length; j++) {
-  //         // printf("  onesLocation=%d \n",  listA[i].data[j] );
+      if(listA[i].length>0){
+        for (int j = 0; j < listA[i].length; j++) {
+          // printf("  onesLocation=%d \n",  listA[i].data[j] );
 
-  //       }
-  //     }
-  //   }
-  //   // puts("");
-  // }
+        }
+      }
+    }
+    // puts("");
+  }
 
 
 
@@ -400,13 +402,13 @@ if (rank == 0) {
       if (locallistA[i].length > 0) {
         for (int j = 0; j < locallistA[i].length; j++) {
           // printf("Here rank =%d\n", rank);
-          //  printf("rank =%d i = %d globalID= %d \n",rank,i,
-          //  locallistA[i].data[0]);
+           printf("rank =%d i = %d globalID= %d \n",rank,i,
+           locallistA[i].data[0]);
           // printf(" rank = %d  localListIndex=%d totallength = %d  data= %d
           // \n", rank, i , locallistA[i].length, locallistA[i].data[j]);
         }
       } else {
-        // printf("rank =%d  i = %d  ID =NULL \n",rank, i);
+        printf("rank =%d  i = %d  ID =NULL \n",rank, i);
       }
     }
   }
