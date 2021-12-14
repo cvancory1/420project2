@@ -118,7 +118,7 @@ int main(int argc, char **argv) {
 
   // allocate  sparse Matrix structure 
   AdjacenyList *listA = malloc(TOTALPAPERS * 2 * sizeof(int) * sizeof(int *));
-  int * Matrixlengths; // will be used for scattering later
+  int * Matrixlengths = NULL; // will be used for scattering later
   int MALLOCEDSIZE = 10;
   
   if (rank == ROOT) {
@@ -139,9 +139,8 @@ int main(int argc, char **argv) {
       listA[i].globalID = -1;
       Matrixlengths[i] = 0;
     }
-  } else {
-    Matrixlengths = NULL;
   }
+ 
 
 
 
@@ -189,8 +188,8 @@ int main(int argc, char **argv) {
 
       // reading the citations of the paper ( versus paperid)
       if (checkCitations == 1 && line[0] != '+') {
-        // track number of citations this paperID has
-        // listA[paperNumber].length++;
+        //track number of citations this paperID has
+        listA[paperNumber].length++;
         Matrixlengths[paperNumber]++;
 
         // printf("listA_it =%d %s\n", paperNumber , line);
@@ -312,8 +311,8 @@ int main(int argc, char **argv) {
 
   // scatter the lengths matrix
   SGData length_counts = getSGCounts(TOTALPAPERS, 1, worldSize);
-  // everyonePrint(rank, "disls=", length_counts.displs);
-  // everyonePrint(rank, "cnts=", length_counts.cnts);
+  everyonePrint(rank, "disls=", length_counts.displs);
+  everyonePrint(rank, "cnts=", length_counts.cnts);
 
   // //  allocate to recv the number of 1's for each row ... will be used to  malloc later
   int *localLenghts = malloc(sizeof(int) * length_counts.cnts[rank]);
