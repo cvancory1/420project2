@@ -378,7 +378,6 @@ if (rank == ROOT) {
   
   }
 
-  /*
   puts("");
 
   MPI_Barrier(world);
@@ -404,15 +403,13 @@ if (rank == ROOT) {
   MPI_Barrier(world);
 
   // calc displacements 
-  for(int i =displs[rank] ; i < citation_counts[rank] ; i ++){
-    if(rank == 1 ) printf("rank=%d citationIds[%d] %d\n", rank,i,  citationIds[i]);
+  
+  for(int i  = displs[rank], j=0 ; j<citation_counts[rank] ; i++ ,j++ ){
+     printf("rank=%d citationIds[%d] %d\n", rank,i,  citationIds[i]);
+
   }
-  
-  
 
-  */
-
-
+  printf("totalciations =%d \n", totalcitations);
 
 
 
