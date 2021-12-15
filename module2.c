@@ -108,15 +108,21 @@ int main(int argc, char **argv) {
   if (fp == NULL) printf("ERROR opening file ");
 
 
-  // REWRITE OF THE FILE READ IN
+
+
+
+  // file read will count how many 1's are in every row of sparse matrix and query for ids to be scattered later
   int * Matrixlengths = NULL;
   int * MatrixIds = NULL;
   char *stmt = "select ind from Meta where id=";
   char *query = malloc(300);
   
+  // set up for later... so each proc knows how many citations to read in
   int totalcitations = 0;
-  if (rank == ROOT) {
 
+
+
+  if (rank == ROOT) {
     char *line = NULL; // buffer to read in from the file 
     size_t len; 
     int numread;
@@ -144,7 +150,9 @@ int main(int argc, char **argv) {
         // //  if (step == SQLITE_ROW) {
             // printf("%s\n", sqlite3_column_text(res, 0));
         // //   }
-        // memset(query, 0 , 300 ); 
+        memset(query, 0 , 300 ); 
+
+        
 
         // puts("new paperid");
       }
@@ -153,7 +161,10 @@ int main(int argc, char **argv) {
       if (checkCitations == 1 && line[0] != '+') {
         //track number of citations this paperID has and count totalcitations in the .txt
         Matrixlengths[paperNumber]++;
+
+        // citation setup for later, each proc will know how many to read in later 
         totalcitations++; 
+       
         // puts("citation");
 
         // switch back - reading in a regular paper not citations
@@ -171,30 +182,31 @@ int main(int argc, char **argv) {
       // next line read in will be a paper to be read in
       if (line[0] == '+') {
         // puts("new paper");
-
         paperNumber++;
          
       }
 
       if(paperNumber % 100000 == 0){
-        // printf("papernumber =%d\n", paperNumber);
+        printf("papernumber =%d\n", paperNumber);
       }
 
       free(line);
       line = NULL;
       len = 0;
-      puts("");
+      // puts("");
 
     }
   }
 
+    puts("====== end of file read ======");
+
+
   //DEBUG
-  for(int i = 0 ; i < TOTALPAPERS ; i ++){
+  // for(int i = 0 ; i < TOTALPAPERS ; i ++){
     // if(rank == ROOT ) printf(" i%d len =%d id =%d \n",i, Matrixlengths[i] , MatrixIds[i] );
-  }
+  // }
 
-
-  // scatter the lengths so each proc knows how many of their localList to allocate 
+  // Calc send counts for all proc to recv rows of the sparse matrix. used in 2 scatters below
   SGData length_counts = getSGCounts(TOTALPAPERS, 1, worldSize);
   // everyonePrint(rank, "disls=", length_counts.displs);
   // everyonePrint(rank, "cnts=", length_counts.cnts);
@@ -267,8 +279,14 @@ int main(int argc, char **argv) {
 // reset file pointer
 fseek( fp , 0 , SEEK_SET);
 
+// root calc how many citations everyone will read in after the queries 
+int * citation_counts = calloc(worldSize , sizeof(int));
+int currentRank = 0; 
+
+MPI_Bcast(&totalcitations, 1 , MPI_INT, ROOT, world);
 // query based on the citation
 int * citationIds = malloc(totalcitations * sizeof(int));
+
 if (rank == ROOT) {
     // TODO declare outside = NULL 
     char *stmt = "select ind from Meta where id=";
@@ -280,49 +298,67 @@ if (rank == ROOT) {
     int paperNumber = 0;; // current paper index being read in from file 
     int checkCitations = 0; // bool 
     int j =0; 
+    int count = 0; // used to track the amount of papers each node will get 
 
     // while !EOF
     while ((numread = getline(&line, &len, fp)) != -1) {
       int length = strlen(line);
-      printf("i=%d line = %s\n", paperNumber , line);
+      // printf("i=%d line = %s\n", paperNumber , line);
 
       // reading in a paperid , query db to find its global index 
      if (checkCitations == 0 && line[0] != '-') {
+      // printf("i=%d line = %s\n", paperNumber , line);
+
         // puts("new paperid");
       }
 
       // reading the citations of the paper ( versus paperid)
       if (checkCitations == 1 && line[0] != '+') {
-        // //puts("citation");
+        // DEBUG 
+        // puts("yes citation");
+
+        //query the db to find where the 1's would be located 
         line[length - 1] = 0;  // removes the newline
         sprintf(query, "%s \'%s\';", stmt, line);
-        printf("query=%s\n", query);
         rc = sqlite3_prepare_v2(db, query, -1, &res, 0);
         int step = sqlite3_step(res);
+
+        // DEBUG         
+        // printf("query=%s\n", query);
         if (step == SQLITE_ROW) {
-          printf("result %s\n", sqlite3_column_text(res, 0));
+          // printf("result %s\n", sqlite3_column_text(res, 0));
         }
-        // int returnedIndex = (int)sqlite3_column_int(res, 0);
         citationIds[j++] = (int)sqlite3_column_int(res, 0);
-        //query the db to find where the 1's would be located 
+        printf("citationIds[%d] %d\n",j-1,  citationIds[j-1]);
+
+
+        // calc how many citations every node needs to read from the citationIDS list 
+        citation_counts[currentRank]++;
+        // printf("rank =%d papernumber=%d query =%s\n",currentRank,  paperNumber, query );
 
 
         // switch back - reading in a regular paper not citations
       }else  if (checkCitations == 1 && line[0] == '+') {
-        //puts("no citations (+)");
+        // puts("no citations (+)");
         checkCitations = 0;
       }
 
       // paper has citations so check them on ... nxt line(s) is the list of cited papers
       if (line[length - 2] == '-'  && line[length - 1] == '\n') {
         checkCitations = 1;  // the next name you read in is a citation
-        //puts("yes citations (-)");
+        // puts("maybe citations (-)");
 
       }
       // next line read in will be a paper to be read in
       if (line[0] == '+') {
-        //puts("new paper");
+        // puts("new paper");
         paperNumber++;
+        count ++; 
+        // printf("rank=%d count=%d count=%d \n",currentRank, count, length_counts.cnts[currentRank]);
+        if(count == length_counts.cnts[currentRank]){
+          currentRank++;
+          count = 0; 
+        }
          
       }
 
@@ -335,14 +371,71 @@ if (rank == ROOT) {
       len = 0;
       //puts("");
 
+        
+
     }
+
+  
   }
+
+  /*
+  puts("");
+
+  MPI_Barrier(world);
+
+  MPI_Bcast(citation_counts, worldSize , MPI_INT, ROOT, world);
+  MPI_Bcast(citationIds, totalcitations , MPI_INT, ROOT, world);
+
+  int * displs = calloc(worldSize, sizeof(int));
+  if(rank == ROOT){
+    displs[0] = 0; 
+    for(int i =1 ;i < worldSize; i++){
+      displs[i] = displs[i-1] + citation_counts[i-1];
+      // printf("disp=%d \n", displs[i]);
+    }
+
+  }
+
+  MPI_Bcast(displs, worldSize , MPI_INT, ROOT, world);
+  // printf("rank=%d disp=%d counts=%d \n",rank,  displs[rank], citation_counts[rank]);
+
+
+
+  MPI_Barrier(world);
+
+  // calc displacements 
+  for(int i =displs[rank] ; i < citation_counts[rank] ; i ++){
+    if(rank == 1 ) printf("rank=%d citationIds[%d] %d\n", rank,i,  citationIds[i]);
+  }
+  
+  
+
+  */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   // HAEV EVERYONE TALLY HOW MANY CITATIONS THEY ARE ABOUT TO RECV 
   //READ FROM THE CITATIONSID ARR AT THAT OFFSET AND THEN DONT SCATTER/...
   // SCATTERING THERE ISNT AN EVEN AMOUNT GOING TO EVERYONE SO 
 
-  // int * localcitationIds = malloc(length_counts.cnts[rank] * sizeof(int));
+  // for (int i = 0; i < length_counts.cnts[rank]; i++) {
+
+  // }
+
+
   
 
 
