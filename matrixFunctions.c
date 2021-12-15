@@ -33,11 +33,11 @@ typedef struct Matrix {
 } Matrix;
 
 
-typedef struct AdjacenyList {
+typedef struct AdjacencyList {
   int globalID;
   int length;
   int *data;  // Holds the global index from db that this paper cites
-} AdjacenyList;
+} AdjacencyList;
 
 
 void everyonePrint(int rank, char *str, int *arr) {
@@ -328,26 +328,15 @@ double powerMethod(Matrix A, Matrix X, int originalRows,int originalCols , int i
 
 
 // locallistSize = rows in Xsub 
-void newpowermethod(AdjacenyList * listA, Matrix  X, int localListSize, int TOTALLISTSIZE, int iterationNum , double epsilon ){
+void newpowermethod(AdjacencyList * listA, Matrix  X, int localListSize, int TOTALLISTSIZE, int iterationNum , double epsilon ){
   // printf("ENTER rank =%d localListSize=%d\n", rank, localListSize);
   // if(rank ==0 ) printf("rows=%d cols=%d\n", X.rows, X.cols);
-    // printf("=%p \n", X.data);
-
-
-  // for every row of the adcaceny list needs to calculate the sum then that gets returned back to 
-  // the main and thn gets reassigned 
-  // so work on x1 , means looking at list1[1]
 
   SGData xSub_counts =  getSGCounts(TOTALLISTSIZE, 1 ,worldSize);
   // everyonePrint(rank,"dipls=",xSub_counts.displs );
   // everyonePrint(rank,"cnts=",xSub_counts.cnts );
 
-
-  // set xsub to 0 , will be used for arithmetic later
-  // double * xsub = malloc( localListSize * sizeof(double)); 
-  // for(int i =0 ; i <localListSize; i++ )xsub[i] =0; 
-
-  // evey proc calculates locallistsize amount of rows in X 
+  // evey proc calculates a portion of X 
   Matrix xsub;
   xsub.rows = localListSize;
   xsub.cols = 1;
@@ -376,7 +365,6 @@ void newpowermethod(AdjacenyList * listA, Matrix  X, int localListSize, int TOTA
         xsub.data[i] += X.data[xlocation];
         printf("rank =%d xlocation=%d adjIndex[%d] =%d X.data[xlocation]=%f xsub.data=%f\n",rank,  xlocation, i, listA[i].data[j],  X.data[xlocation], xsub.data[i]);
       }
-      // puts("");
       // printf("FINAL xsub.data[%d] =%f\n", i , xsub.data[i]);
     }
 
@@ -384,7 +372,7 @@ void newpowermethod(AdjacenyList * listA, Matrix  X, int localListSize, int TOTA
     double E = fabs(euclidean_norm(diff));
 
     MPI_Barrier(world);
-    // error checking xsub after its finshed adding 
+    // DEBUG 
     for(int i =0 ; i< localListSize ; i++){
       // printf("rank=%d  xsub[%d] =%f\n\n",rank, i , xsub[i]);
 
@@ -407,12 +395,6 @@ void newpowermethod(AdjacenyList * listA, Matrix  X, int localListSize, int TOTA
 
     }
 
-    
-    
-    if(E < epsilon ){
-      printf("========RETURN EARLY Count = %d Printing X: (========\n", count);
-    }
-
     if(count < iterationNum ){
         X = calcNorm(X);
         if(rank ==ROOT){
@@ -423,7 +405,9 @@ void newpowermethod(AdjacenyList * listA, Matrix  X, int localListSize, int TOTA
 
         }
     }else if(count == iterationNum || E < epsilon) {
-      // return X; 
+        if(E < epsilon ){
+          printf("========RETURN EARLY Count = %d Printing X: (========\n", count);
+        }
       // puts(" ------- ");
       // printf("Count = %d Printing X:\n", count);
       // printMatrix(X);
