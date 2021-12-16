@@ -95,18 +95,22 @@ int main(int argc, char **argv) {
   }
 
   // opens the citation file
-  FILE *fp;
+  FILE *fp= NULL;
   // fp = fopen("testCitations.txt", "r");
   // int TOTALPAPERS = 50; // number of rows in the AdjacencyList
 
-  fp = fopen("testCitations2.txt", "r");
-  int TOTALPAPERS = 295;  // number of rows in the AdjacencyList
+  //fp = fopen("testCitations2.txt", "r");
+  //int TOTALPAPERS = 295;  // number of rows in the AdjacencyList
 
-  // int TOTALPAPERS = 1354753;
-  // fp = fopen("arxiv-citations.txt", "r");
+   int TOTALPAPERS = 1354753;
+   if(rank ==ROOT) {
+    fp = fopen("arxiv-citations.txt", "r");
 
-  if (fp == NULL) printf("ERROR opening file ");
-
+    if (fp == NULL){
+       printf("ERROR opening file ");
+      return 1;
+     }
+  }
   // file read will count how many 1's are in every row of sparse matrix and query for ids to be scattered later
   int * Matrixlengths = NULL;
   int * MatrixIds = NULL;
@@ -245,9 +249,8 @@ int main(int argc, char **argv) {
     if(rank ==0 ) puts("====== end of Scatter ======");
 
     // FREE 
-    free(Matrixlengths);
-    free(MatrixIds);
-
+    if(rank == ROOT ) free(Matrixlengths);
+    if(rank ==ROOT )free(MatrixIds);
 
   // all proc create local sparse matric and populate with the list 
   AdjacencyList *locallistA = malloc(length_counts.cnts[rank] * sizeof(AdjacencyList));
@@ -270,13 +273,16 @@ int main(int argc, char **argv) {
   }
 
 
+
+  if(rank == ROOT) puts(" ===== ADJACENCY LIST  =======");
  // count how many total citations exist across the nodes have the node reread and store
  // the global ids into one giant array and then scatter that then 
 //  every local list fills that array again ... same as above 
 
 
+
 // reset file pointer
-fseek( fp , 0 , SEEK_SET);
+if(rank == ROOT )fseek( fp , 0 , SEEK_SET);
 
 // root calc how many citations everyone will read in after the queries 
 int * citation_counts = calloc(worldSize , sizeof(int));
@@ -289,7 +295,6 @@ int * citationIds = malloc(totalcitations * sizeof(int));
 // char *query = malloc(200);
 
 if (rank == ROOT) {
-    // TODO declare outside = NULL 
 
     char *line = NULL; // buffer to read in from the file 
     size_t len; 
@@ -362,7 +367,7 @@ if (rank == ROOT) {
       }
 
       if(paperNumber % 100000 == 0){
-        // printf("papernumber =%d\n", paperNumber);
+        printf("papernumber =%d\n", paperNumber);
       }
 
       free(line);
@@ -372,7 +377,9 @@ if (rank == ROOT) {
     }
   }
 
-  // puts("");
+  if(rank == ROOT) puts(" ===== end of file read 2 =======");
+
+
   MPI_Barrier(world);
   MPI_Bcast(citation_counts, worldSize , MPI_INT, ROOT, world);
   MPI_Bcast(citationIds, totalcitations , MPI_INT, ROOT, world);
@@ -432,22 +439,16 @@ if (rank == ROOT) {
 
 
 
-/*
   // sending matrix lengths into the power method
   double e = 10E-16;
   newpowermethod(locallistA, X, length_counts.cnts[rank], TOTALPAPERS, 5, e);
 
-  // puts("outside powermethod ");
+  puts("outside powermethod ");
   if (rank == ROOT) {
-    for (int i =0 ; i < TOTALPAPERS ; i++){
-    // printf("data=%f \n", pageRanks.data[i]);
-    // printf("data=%f \n", X.data[i]);
-    }
-    // printf("data=%f \n", X.data[0]);
-  }
+    printMatrix(X);
+    puts("finish printing");  
+  } 
 
-
-*/
   sqlite3_close(db);
   MPI_Finalize();
 

@@ -336,7 +336,8 @@ void newpowermethod(AdjacencyList * listA, Matrix  X, int localListSize, int TOT
   // everyonePrint(rank,"dipls=",xSub_counts.displs );
   // everyonePrint(rank,"cnts=",xSub_counts.cnts );
 
-  // evey proc calculates a portion of X 
+  // evey
+  //proc calculates a portion of X 
   Matrix xsub;
   xsub.rows = localListSize;
   xsub.cols = 1;
@@ -358,25 +359,25 @@ void newpowermethod(AdjacencyList * listA, Matrix  X, int localListSize, int TOT
       for(int j = 0 ; j < listA[i].length; j++){
         // printf("length=%d listA[%d].data=%d \n",listA[i].length , i , listA[i].data[j] );
         int xlocation = listA[i].data[j];
-        if(xlocation > X.rows){
-          printf("chloe seg fault will happen on this test case\n");
-          return ;
-        }
+        //if(xlocation > X.rows){
+         // printf("chloe seg fault will happen on this test case\n");
+          //return ;
+        //}
         xsub.data[i] += X.data[xlocation];
-        printf("rank =%d xlocation=%d adjIndex[%d] =%d X.data[xlocation]=%f xsub.data=%f\n",rank,  xlocation, i, listA[i].data[j],  X.data[xlocation], xsub.data[i]);
+       // printf("rank =%d xlocation=%d adjIndex[%d] =%d X.data[xlocation]=%f xsub.data=%f\n",rank,  xlocation, i, listA[i].data[j],  X.data[xlocation], xsub.data[i]);
       }
       // printf("FINAL xsub.data[%d] =%f\n", i , xsub.data[i]);
     }
 
     Matrix diff = matrixSubtraction(xsub, X);
-    double E = fabs(euclidean_norm(diff));
+    //double E = fabs(euclidean_norm(diff));
 
     MPI_Barrier(world);
     // DEBUG 
-    for(int i =0 ; i< localListSize ; i++){
+    //for(int i =0 ; i< localListSize ; i++){
       // printf("rank=%d  xsub[%d] =%f\n\n",rank, i , xsub[i]);
 
-    }
+    //}
 
     MPI_Allgatherv(
                     xsub.data,  // sendbuf
@@ -409,7 +410,7 @@ void newpowermethod(AdjacencyList * listA, Matrix  X, int localListSize, int TOT
           printf("========RETURN EARLY Count = %d Printing X: (========\n", count);
         }
       // puts(" ------- ");
-      // printf("Count = %d Printing X:\n", count);
+      printf("Count = %d Printing X:\n", count);
       // printMatrix(X);
       // puts(" ------- ");
      
