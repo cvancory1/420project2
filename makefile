@@ -15,7 +15,7 @@ moduletest.o: moduletest.c matrixFunctions.c
 sqltest: sqltest.c
 	gcc -std=c99 sqltest.c -o sqltest -lsqlite3
 
-module1: tree.c 
+module1: tree.c module1.c
 	mpicc -std=c99 -g -lm module1.c -o  module1
 
 matrixtest: matrixtest.o
@@ -24,6 +24,9 @@ matrixtest: matrixtest.o
 
 matrixtest.o: matrixtest.c matrixFunctions.c
 	mpicc -std=c99 -g -c  matrixtest.c
+
+search: search.c uthash.h
+	gcc -std=c99 search.c -o search
 
 clean:
 	rm -f *.o
