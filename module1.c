@@ -103,6 +103,13 @@ int isWord(char *string) {
 	return 1;
 }
 
+void strlower(char *string) {
+	if (!string) return;
+	for (int i = 0; i < strlen(string); i++) {
+		string[i] = tolower(string[i]);
+	}
+}
+
 int main(int argc, char** argv) {
 	MPI_Init(&argc, &argv);
 	MPI_Comm world = MPI_COMM_WORLD;
@@ -160,7 +167,8 @@ int main(int argc, char** argv) {
 
 	int *sendcounts = malloc(worldSize*sizeof(int));
 	//int lines = 100;
-	int lines = 50;
+	//int lines = 50;
+	int lines = 8140940;
 	int papers = lines / 5;
 	int start = papers / worldSize;
 	for (int i = 0; i < worldSize; i++) {
@@ -195,7 +203,8 @@ int main(int argc, char** argv) {
 
 
 
-	fp = fopen("example.txt", "r");
+	fp = fopen("arxiv-metadata.txtDGFP", "r");
+	//fp = fopen("example.txt", "r");
 	//fp = fopen("chloe.txt", "r");
 
 	int count = 0;
@@ -217,6 +226,12 @@ int main(int argc, char** argv) {
 		buf[strlen(buf)-1] = '\0';
 		//printf("%s\n", buf);
 
+		if (rank == 0) {
+			//if (index % 100000 == 0 && index > 0) {
+			if (count % 1000 == 0 && index > 0) {
+				printf("ind %d\n", count);
+			}
+		}
 		// id
 		if (count % 5 == 0) {
 		}
@@ -227,6 +242,7 @@ int main(int argc, char** argv) {
 				if (index >= displ[rank] && index < displ[rank+1]) {
 					//printf("buf %s and rank %d\n", buf, rank);
 					char *string = strtok(buf, " ");
+					strlower(string);
 					while (string != NULL) {
 						if (isWord(string)) {
 							if (!(list_contains(&mylist, string))) {
@@ -235,6 +251,7 @@ int main(int argc, char** argv) {
 							}
 						}
 						string = strtok(NULL, " ");
+						strlower(string);
 					}	
 				}
 			}
@@ -242,6 +259,7 @@ int main(int argc, char** argv) {
 				if (index >= displ[rank]) {
 					//printf("buf %s and rank %d\n", buf, rank);
 					char *string = strtok(buf, " ");
+					strlower(string);
 					while (string != NULL) {
 						//list_append(&mylist, string);	
 						if (isWord(string)) {
@@ -252,6 +270,7 @@ int main(int argc, char** argv) {
 						}
 						//printf("z: %s\n", string);
 						string = strtok(NULL, " ");
+						strlower(string);
 					}	
 				}
 			}
@@ -267,6 +286,7 @@ int main(int argc, char** argv) {
 				if (index >= displ[rank] && index < displ[rank+1]) {
 					//printf("buf %s and rank %d\n", buf, rank);
 					char *string = strtok(buf, " ");
+					strlower(string);
 					while (string != NULL) {
 					//	list_append(&mylist, string);	
 						if (isWord(string)) {
@@ -277,6 +297,7 @@ int main(int argc, char** argv) {
 						}
 						//printf("z: %s\n", string);
 						string = strtok(NULL, " ");
+						strlower(string);
 					}	
 				}
 			}
@@ -284,6 +305,7 @@ int main(int argc, char** argv) {
 				if (index >= displ[rank]) {
 					//printf("buf %s and rank %d\n", buf, rank);
 					char *string = strtok(buf, " ");
+					strlower(string);
 					while (string != NULL) {
 						//list_append(&mylist, string);	
 						if (isWord(string)) {	
@@ -294,6 +316,7 @@ int main(int argc, char** argv) {
 						}
 						//printf("z: %s\n", string);
 						string = strtok(NULL, " ");
+						strlower(string);
 					}	
 				}
 			}
@@ -313,13 +336,20 @@ int main(int argc, char** argv) {
 	void *data;
 	//unsigned long long sum = 0;
 	int sum = 0;
+	int bench = 0;
+	
 	while ((data = list_iterator_next(&mylist))) {
 		//((char*)data)[strlen(data)] = '#';
 		//printf("%s\n", strlen(((char*)data)));
 		//printf("%s = %d\n", ((char *)data), strlen(data));
+		//printf("%s\n", ((char *)data));
 		
 		//printf("LENGTH: %d\n", strlen(data));
 		sum += 1 + strlen(data);
+		if (bench % 1000 == 0 && rank == 0) {
+			printf("get size bench: %d\n", bench);
+		}
+		bench++;
 	}
 	sum++;
 	//t = list_iterator_stop(&mylist);
@@ -332,16 +362,22 @@ int main(int argc, char** argv) {
 
 	char *words = malloc(sum);
 	memset(words, '\0', sum);
+	bench = 0;
 	while ((data = list_iterator_next(&mylist))) {
 		//((char*)data)[strlen(data)] = '#';
 		//printf("%s\n", strlen(((char*)data)));
 		//printf("%s = %d\n", ((char *)data), strlen(data));
+	//	printf("%s\n", ((char *)data));
 		
 		//printf("LENGTH: %d\n", strlen(data));
 		//
 		strcat(words, data);		
 		strcat(words, "#");		
 		//words[strlen(data)] = '#';
+		if (bench % 1000 == 0 && rank == 0) {
+			printf("strcat bench: %d\n", bench);
+		}
+		bench++;	
 	}
 	//t = list_iterator_stop(&mylist);
 	list_iterator_stop(&mylist);
@@ -353,6 +389,9 @@ int main(int argc, char** argv) {
 	//printf("word length %d and sum %d\n", strlen(words), sum);
 
 	//unsigned long long *sizes = NULL;
+	//MPI_Barrier(world);
+	//printf("rank %d GATHERING\n", rank);
+	
 	int *sizes = NULL;
 	if (rank == 0) {
 		//sizes = malloc(sizeof(unsigned long long)*worldSize);
@@ -360,6 +399,7 @@ int main(int argc, char** argv) {
 	}
 
 	sum = strlen(words);
+	
 	
 	MPI_Gather(
 		&sum,
@@ -395,8 +435,11 @@ int main(int argc, char** argv) {
 		combinedWords[total-2] = '\0';
 	}
 
-	printf("total: %d and sum %d and rank %d\n", total, sum, rank);
+	//printf("total: %d and sum %d and rank %d\n", total, sum, rank);
 	//MPI_Barrier(world);
+	//
+	//MPI_Barrier(world);
+	//printf("rank %d GATHER VVVVVVVVV\n", rank);
 	MPI_Gatherv(
 		words,
 		sum,
@@ -416,9 +459,14 @@ int main(int argc, char** argv) {
 	list_attributes_copy(&mylist, list_meter_string, 1);
 	list_attributes_comparator(&mylist, list_comparator_string);
 
+	bench = 0;
 	if (rank == 0) {
 		char *string = strtok(combinedWords, "#");
 		while (string != NULL) {
+			if (bench % 1000 == 0 && rank == 0) {
+				printf("combined bench: %d\n", bench);
+			}
+			bench++;
 			if (!(list_contains(&mylist, string))) {
 				list_append(&mylist, string);	
 				//printf("z: %s\n", string);
@@ -426,6 +474,9 @@ int main(int argc, char** argv) {
 			//printf("z: %s\n", string);
 			string = strtok(NULL, "#");
 		}
+		
+		FILE *fp;
+		fp = fopen("wordlist.txt", "w");
 
 		list_iterator_start(&mylist);
 
@@ -434,9 +485,10 @@ int main(int argc, char** argv) {
 			//printf("%s\n", strlen(((char*)data)));
 			//printf("%s = %d\n", ((char *)data), strlen(data));
 			//
-			printf("%s ", ((char *)data));
+			//printf("%s ", ((char *)data));
 			
 			//printf("LENGTH: %d\n", strlen(data));
+			fprintf(fp, "%s\n", (char*)data);
 		}
 		list_iterator_stop(&mylist);
 		
