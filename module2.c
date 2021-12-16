@@ -107,10 +107,6 @@ int main(int argc, char **argv) {
 
   if (fp == NULL) printf("ERROR opening file ");
 
-
-
-
-
   // file read will count how many 1's are in every row of sparse matrix and query for ids to be scattered later
   int * Matrixlengths = NULL;
   int * MatrixIds = NULL;
@@ -119,8 +115,6 @@ int main(int argc, char **argv) {
   
   // set up for later... so each proc knows how many citations to read in
   int totalcitations = 0;
-
-
 
   if (rank == ROOT) {
     char *line = NULL; // buffer to read in from the file 
@@ -151,8 +145,6 @@ int main(int argc, char **argv) {
             // printf("%s\n", sqlite3_column_text(res, 0));
         // //   }
         memset(query, 0 , 300 ); 
-
-        
 
         // puts("new paperid");
       }
@@ -208,8 +200,8 @@ int main(int argc, char **argv) {
 
   // Calc send counts for all proc to recv rows of the sparse matrix. used in 2 scatters below
   SGData length_counts = getSGCounts(TOTALPAPERS, 1, worldSize);
-  // everyonePrint(rank, "disls=", length_counts.displs);
-  // everyonePrint(rank, "cnts=", length_counts.cnts);
+  everyonePrint(rank, "disls=", length_counts.displs);
+  everyonePrint(rank, "cnts=", length_counts.cnts);
 
   //  allocate to recv the number of 1's for each row ... will be used to  malloc later
   int *localLengths= malloc(sizeof(int) * length_counts.cnts[rank]);
@@ -246,6 +238,7 @@ int main(int argc, char **argv) {
   //    }
   //  }
 
+    if(rank ==0 ) puts("====== end of Scatter ======");
 
 
   // all proc create local sparse matric and populate with the list 
@@ -286,11 +279,11 @@ int currentRank = 0;
 MPI_Bcast(&totalcitations, 1 , MPI_INT, ROOT, world);
 // query based on the citation
 int * citationIds = malloc(totalcitations * sizeof(int));
+// char *stmt = "select ind from Meta where id=";
+// char *query = malloc(200);
 
 if (rank == ROOT) {
     // TODO declare outside = NULL 
-    char *stmt = "select ind from Meta where id=";
-    char *query = malloc(200);
 
     char *line = NULL; // buffer to read in from the file 
     size_t len; 
@@ -329,7 +322,7 @@ if (rank == ROOT) {
           // printf("result %s\n", sqlite3_column_text(res, 0));
         }
         citationIds[j++] = (int)sqlite3_column_int(res, 0);
-        printf("citationIds[%d] %d\n",j-1,  citationIds[j-1]);
+        // printf("citationIds[%d] %d\n",j-1,  citationIds[j-1]);
 
 
         // calc how many citations every node needs to read from the citationIDS list 
@@ -373,7 +366,7 @@ if (rank == ROOT) {
     }
   }
 
-  puts("");
+  // puts("");
   MPI_Barrier(world);
   MPI_Bcast(citation_counts, worldSize , MPI_INT, ROOT, world);
   MPI_Bcast(citationIds, totalcitations , MPI_INT, ROOT, world);
