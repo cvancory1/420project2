@@ -144,6 +144,10 @@ int main(int argc, char **argv) {
         // //  if (step == SQLITE_ROW) {
             // printf("%s\n", sqlite3_column_text(res, 0));
         // //   }
+
+        // DELETE LATER 
+        MatrixIds[paperNumber] = 100; 
+
         memset(query, 0 , 300 ); 
 
         // puts("new paperid");
