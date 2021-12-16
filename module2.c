@@ -265,12 +265,10 @@ int main(int argc, char **argv) {
 
   }
 
-/* 
-  count how many total citations exist across the nodes have the node reread and store
-  the global ids into one giant array and then scatter that then 
-  every local list fills that array again ... same as above 
 
-*/ 
+ // count how many total citations exist across the nodes have the node reread and store
+ // the global ids into one giant array and then scatter that then 
+//  every local list fills that array again ... same as above 
 
 
 // reset file pointer
@@ -424,7 +422,7 @@ if (rank == ROOT) {
   for (int i = 0; i < TOTALPAPERS; i++) {
     X.data[i] = 1;
   }
-
+/*
   // sending matrix lengths into the power method
   double e = 10E-16;
   newpowermethod(locallistA, X, length_counts.cnts[rank], TOTALPAPERS, 5, e);
@@ -439,7 +437,7 @@ if (rank == ROOT) {
   }
 
 
-
+*/
   sqlite3_close(db);
   MPI_Finalize();
 
