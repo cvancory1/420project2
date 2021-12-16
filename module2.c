@@ -370,21 +370,16 @@ if (rank == ROOT) {
       line = NULL;
       len = 0;
       //puts("");
-
-        
-
     }
-
-  
   }
 
   puts("");
-
   MPI_Barrier(world);
-
   MPI_Bcast(citation_counts, worldSize , MPI_INT, ROOT, world);
   MPI_Bcast(citationIds, totalcitations , MPI_INT, ROOT, world);
 
+  
+  //calc displs
   int * displs = calloc(worldSize, sizeof(int));
   if(rank == ROOT){
     displs[0] = 0; 
@@ -401,19 +396,27 @@ if (rank == ROOT) {
 
 
   MPI_Barrier(world);
+  // for(int i  = displs[rank], j=0 ; j<citation_counts[rank] ; i++ ,j++ ){
+  //    printf("rank=%d citationIds[%d] %d\n", rank,i,  citationIds[i]);
+  // }
 
-  // calc displacements 
-  
-  for(int i  = displs[rank], j=0 ; j<citation_counts[rank] ; i++ ,j++ ){
-     printf("rank=%d citationIds[%d] %d\n", rank,i,  citationIds[i]);
 
+  // everyone start at their offsets 
+  int localcounter = displs[rank];
+  int j=0; 
+
+  // assign citationIDs to the localLists
+   for (int i = 0; i < length_counts.cnts[rank]; i++) {
+    // if papers were cited , allocate space
+    if (locallistA[i].length > 0) {
+      for(int j= 0 ; j < locallistA[i].length;j++ ){
+        locallistA[i].data[j] = citationIds[localcounter++];
+        printf("rank=%d data[%d]=%d\n",rank, j , locallistA[i].data[j]);
+
+      }
+      // printf("rank=%d locallistA[i].length=%d\n",rank, locallistA[i].length);
+    } 
   }
-
-  printf("totalciations =%d \n", totalcitations);
-
-
-
-
 
 
 
