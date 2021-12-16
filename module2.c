@@ -94,6 +94,9 @@ int main(int argc, char **argv) {
     return 1;
   }
 
+ 
+
+
   // opens the citation file
   FILE *fp= NULL;
   // fp = fopen("testCitations.txt", "r");
@@ -109,7 +112,7 @@ int main(int argc, char **argv) {
     if (fp == NULL){
        printf("ERROR opening file ");
       return 1;
-     }
+     } // bugs bugs go away come again another day
   }
   // file read will count how many 1's are in every row of sparse matrix and query for ids to be scattered later
   int * Matrixlengths = NULL;
@@ -150,7 +153,7 @@ int main(int argc, char **argv) {
         // //   }
 
         // DELETE LATER 
-        MatrixIds[paperNumber] = 100; 
+        // MatrixIds[paperNumber] = 100; 
 
         memset(query, 0 , 300 ); 
 
@@ -207,8 +210,8 @@ int main(int argc, char **argv) {
 
   // Calc send counts for all proc to recv rows of the sparse matrix. used in 2 scatters below
   SGData length_counts = getSGCounts(TOTALPAPERS, 1, worldSize);
-  everyonePrint(rank, "disls=", length_counts.displs);
-  everyonePrint(rank, "cnts=", length_counts.cnts);
+  // everyonePrint(rank, "disls=", length_counts.displs);
+  // everyonePrint(rank, "cnts=", length_counts.cnts);
 
   //  allocate to recv the number of 1's for each row ... will be used to  malloc later
   int *localLengths= malloc(sizeof(int) * length_counts.cnts[rank]);
@@ -291,8 +294,6 @@ int currentRank = 0;
 MPI_Bcast(&totalcitations, 1 , MPI_INT, ROOT, world);
 // query based on the citation
 int * citationIds = malloc(totalcitations * sizeof(int));
-// char *stmt = "select ind from Meta where id=";
-// char *query = malloc(200);
 
 if (rank == ROOT) {
 
@@ -424,20 +425,13 @@ if (rank == ROOT) {
   }
 
 
-  // FREE
-  // free(citationIds);
-  // free(citation_counts);
+
 
 
   Matrix X;
   X.rows = TOTALPAPERS;
   X.cols = 1;
   X.data = calloc(TOTALPAPERS, sizeof(double) * sizeof(Matrix));
-  for (int i = 0; i < TOTALPAPERS; i++) {
-    X.data[i] = 1;
-  }
-
-
 
   // sending matrix lengths into the power method
   double e = 10E-16;
@@ -449,6 +443,29 @@ if (rank == ROOT) {
     puts("finish printing");  
   } 
 
+
+  // TODO begin querying the database with the page rank 
+  // char * test = malloc(300); 
+  // sprintf(test, "INSERT INTO Meta (PageRank) VALUES (%f) where id = '%s';", 98.99, "plasm-ph/9607002" );
+	// rc = sqlite3_exec(db, test, callback, 0, &err_msg);
+
+
+
+  // FREE
+  free(citationIds);
+  free(citation_counts);
+  free(X.data);
+  for (int i = 0; i < length_counts.cnts[rank]; i++) {
+    free(locallistA[i].data);
+  }
+  free(locallistA);
+
+  free(displs);
+  free(localLengths);
+  free(localIds);
+  free(length_counts.cnts);
+  free(length_counts.displs);
+
   sqlite3_close(db);
   MPI_Finalize();
 
@@ -458,103 +475,3 @@ if (rank == ROOT) {
 
 
 
-
-
-
-
-
-
-// if (rank == ROOT) {
-//     char *line = NULL;
-//     int numread;
-//     int curPaperCount =
-//         0;  // index of the current paper we are looking at in the list
-//     int i = 0;
-//     for (i = 0; i < worldSize; i++)
-//       sendcnt[i] = 0;  // initalize the sendcounts = 0
-//     int citedCount = 0;  // counts the len of "rows" array
-//     size_t len = 0;      // used by getline function (gets returned a power of 2
-//                          // corresponding to bytes read)
-//     int listA_it = 0;        // traverse through A arrary
-//     int checkCitations = 0;  // ensures the name being read in is a cited paper
-//                              // and an actual paperID
-//     srand(time(0) + rank);
-//     // while stuff to read in the file 
-//     while ((numread = getline(&line, &len, fp)) != -1) {
-//       int length = strlen(line);
-//       sendcnt[i] += numread;  // tracks the total amount of bytes
-//       // assign global index of current paperid being read
-//       if (checkCitations == 0 && line[0] != '-') {
-//         // printf("listA_it =%d %s\n", listA_it , line);
-//         line[length - 1] = 0;  // removes the newline
-//         char *stmt = "select ind from Meta where id=";
-//         char *query = malloc(200);
-//         sprintf(query, "%s \'%s\';", stmt, line);
-//         rc = sqlite3_prepare_v2(db, query, -1, &res, 0);
-//         int step = sqlite3_step(res);
-//         // if (step == SQLITE_ROW) {
-//         //   // printf("%s\n", sqlite3_column_text(res, 0));
-//         // }
-//         // UNCOMMENT THIS ON REAL TEST CASE
-//         //  listA[listA_it].globalID = (int)sqlite3_column_int(res, 0);
-//         listA[listA_it].globalID = rand() % TOTALPAPERS;
-//       }
-//       // if we are reading the citations ( versus paperid)
-//       if (checkCitations == 1 && line[0] != '+') {
-//         // citations are being counted for current paper
-//         listA[listA_it].length++;
-//         Matrixlengths[listA_it]++;
-//         // printf("listA_it =%d %s\n", listA_it , line);
-//         line[length - 1] = 0;  // removes the newline
-//         char *stmt = "select ind from Meta where id=";
-//         char *query = malloc(200);
-//         sprintf(query, "%s \'%s\';", stmt, line);
-//         // printf("count =%d %s\n",listA_it,  test);
-//         // query the db NEED CHAGE THIS AFTER WE IMPLEMENT A DIFFERENT STRUCTURE
-//         // rc = sqlite3_prepare_v2(db, query, -1, &res, 0);
-//         // int step = sqlite3_step(res);
-//         // if (step == SQLITE_ROW) {
-//         //   // printf("%s\n", sqlite3_column_text(res, 0));
-//         // }
-//         // int returnedIndex = (int)sqlite3_column_int(res, 0);
-//         int returnedIndex = rand() % TOTALPAPERS;  //  TODO  NEEDS TO BE DELETED
-//         int dataIT = listA[listA_it].length - 1;
-//         listA[listA_it].data[dataIT] = returnedIndex;
-//         // printf(" title= %s citationIndex =%d globalIndex =%d arrIndex =%d\n",
-//         // line , listA_it , returnedIndex , dataIT);
-//         //  printf(" data=%d          dataIT =%d ----\n",  dataIT);
-//         // more than 10 citations , need to realloc the data array
-//         // if(listA[listA_it].length > MALLOCEDSIZE ){
-//         //   int newSize = listA[listA_it].length * 2; // curent length * 2,
-//         //   first resize occurs after 10 citations listA[listA_it].data =
-//         //   (int*) realloc( listA[listA_it].data  , newSize * sizeof(int));
-//         // }
-//         // switch back
-//       } else if (checkCitations == 1 && line[0] == '+') {
-//         checkCitations = 0;
-//         // TODO: should i free it if it has no citations at all
-//       }
-//       // nxt line is the list of cited papers
-//       if (line[length - 2] == '-' && line[length - 1] == '\n') {
-//         checkCitations = 1;  // the next name you read in is a citation
-//       }
-//       // indicates a new paper is being read in next
-//       if (line[0] == '+') {
-//         curPaperCount++;
-//         listA_it++;
-//         if (curPaperCount == localPapercount[i]) {
-//           // printf("citedCount=%d \n", citedCount);
-//           citedCount = 0;  // resets the cited count
-//           i++;
-//           curPaperCount = 0;
-//         }
-//       }
-//       free(line);
-//       line = NULL;
-//       len = 0;
-//       // benchmark printing of what row we are reading in the citations file
-//       if (listA_it % 1000 == 1) {
-//         // printf("count =%d \n",listA_it);
-//       }
-//     }
-//   }
