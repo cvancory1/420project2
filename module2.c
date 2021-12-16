@@ -196,7 +196,6 @@ int main(int argc, char **argv) {
 
     puts("====== end of file read ======");
 
-
   //DEBUG
   // for(int i = 0 ; i < TOTALPAPERS ; i ++){
     // if(rank == ROOT ) printf(" i%d len =%d id =%d \n",i, Matrixlengths[i] , MatrixIds[i] );
@@ -242,7 +241,12 @@ int main(int argc, char **argv) {
   //    }
   //  }
 
+
     if(rank ==0 ) puts("====== end of Scatter ======");
+
+    // FREE 
+    free(Matrixlengths);
+    free(MatrixIds);
 
 
   // all proc create local sparse matric and populate with the list 
@@ -399,7 +403,6 @@ if (rank == ROOT) {
 
   // everyone start at their offsets 
   int localcounter = displs[rank];
-
   // assign citationIDs to the localLists
    for (int i = 0; i < length_counts.cnts[rank]; i++) {
     // if papers were cited , allocate space
@@ -414,14 +417,21 @@ if (rank == ROOT) {
   }
 
 
+  // FREE
+  // free(citationIds);
+  // free(citation_counts);
+
 
   Matrix X;
   X.rows = TOTALPAPERS;
   X.cols = 1;
-  X.data = malloc(sizeof(double) * sizeof(Matrix));
+  X.data = calloc(TOTALPAPERS, sizeof(double) * sizeof(Matrix));
   for (int i = 0; i < TOTALPAPERS; i++) {
     X.data[i] = 1;
   }
+
+
+
 /*
   // sending matrix lengths into the power method
   double e = 10E-16;
