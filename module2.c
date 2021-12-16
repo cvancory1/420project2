@@ -96,11 +96,11 @@ int main(int argc, char **argv) {
 
   // opens the citation file
   FILE *fp;
-  fp = fopen("testCitations.txt", "r");
-  int TOTALPAPERS = 50; // number of rows in the AdjacencyList
+  // fp = fopen("testCitations.txt", "r");
+  // int TOTALPAPERS = 50; // number of rows in the AdjacencyList
 
-  // fp = fopen("testCitations2.txt", "r");
-  // int TOTALPAPERS = 295;  // number of rows in the AdjacencyList
+  fp = fopen("testCitations2.txt", "r");
+  int TOTALPAPERS = 295;  // number of rows in the AdjacencyList
 
   // int TOTALPAPERS = 1354753;
   // fp = fopen("arxiv-citations.txt", "r");
@@ -396,6 +396,7 @@ if (rank == ROOT) {
 
 
   MPI_Barrier(world);
+  //DEBUG
   // for(int i  = displs[rank], j=0 ; j<citation_counts[rank] ; i++ ,j++ ){
   //    printf("rank=%d citationIds[%d] %d\n", rank,i,  citationIds[i]);
   // }
@@ -403,7 +404,6 @@ if (rank == ROOT) {
 
   // everyone start at their offsets 
   int localcounter = displs[rank];
-  int j=0; 
 
   // assign citationIDs to the localLists
    for (int i = 0; i < length_counts.cnts[rank]; i++) {
@@ -411,138 +411,35 @@ if (rank == ROOT) {
     if (locallistA[i].length > 0) {
       for(int j= 0 ; j < locallistA[i].length;j++ ){
         locallistA[i].data[j] = citationIds[localcounter++];
-        printf("rank=%d data[%d]=%d\n",rank, j , locallistA[i].data[j]);
 
+        //DEBUG 
+        // printf("rank=%d data[%d]=%d\n",rank, j , locallistA[i].data[j]);
       }
-      // printf("rank=%d locallistA[i].length=%d\n",rank, locallistA[i].length);
     } 
   }
 
 
 
+  Matrix X;
+  X.rows = TOTALPAPERS;
+  X.cols = 1;
+  X.data = malloc(sizeof(double) * sizeof(Matrix));
+  for (int i = 0; i < TOTALPAPERS; i++) {
+    X.data[i] = 1;
+  }
 
+  // sending matrix lengths into the power method
+  double e = 10E-16;
+  newpowermethod(locallistA, X, length_counts.cnts[rank], TOTALPAPERS, 5, e);
 
-
-
-
-
-
-  // HAEV EVERYONE TALLY HOW MANY CITATIONS THEY ARE ABOUT TO RECV 
-  //READ FROM THE CITATIONSID ARR AT THAT OFFSET AND THEN DONT SCATTER/...
-  // SCATTERING THERE ISNT AN EVEN AMOUNT GOING TO EVERYONE SO 
-
-  // for (int i = 0; i < length_counts.cnts[rank]; i++) {
-
-  // }
-
-
-  
-
-
-  /*
-    todo 
-    - make sure that the number of localcitations = the citations in here
-    - look at the db and make the first query to see what the id is 
-
-    
-  */
-
-
-
-  //puts("finish");
-
-//   // updated version 
-// if (rank == 0) {
-//     int sendRoot = 1;
-//     int count = 0; 
-
-
-//     // send the global ID 
-//       MPI_Send(listA[i].data,    // buf
-//                listA[i].length,  // amount sending - count
-//                MPI_INT,          // dtype
-//                sendRoot,         //  dest
-//                sendRoot,         // tag
-//                world             // comm
-//       );
-
-
-//       count++;
-
-//     if (count == length_counts.cnts[sendRoot]) {
-//       // printf("sendroot=%d  i=%d  count=%d \n",sendRoot, i, count );
-//       sendRoot++;
-//       count = 0;
-//     }
-//   } 
-
-
-// //   // other proc recv 
-//   if(rank == ROOT ){
-//     // root "sends" by copying its data over 
-//     for (i = 0 ; i < length_counts.cnts[ROOT]; i++) {
-
-//     }
-
-
-//   }else if(rank != ROOT){
-//     int number_amount;
-//     for (i = 0; i < length_counts.cnts[rank]; i++) {
-//       MPI_Status status;
-
-//       // MPI_Recv(locallistA[i].data, localLenghts[i], MPI_INT, ROOT, MPI_ANY_TAG,
-//       //         world, &status);
-
-//       MPI_Get_count(&status, MPI_INT, &number_amount);
-//       // printf(
-//       //     "received %d numbers from 0. Message source = %d, "
-//       //     "tag = %d\n",
-//       //     number_amount, status.MPI_SOURCE, status.MPI_TAG);
-//     }
-//   }
-
-  // everyone query from their locallists
-
-
-//   //// DEBUG - error checking recv arrays for root , printing the original matrix
-//   if (rank == 0) {
-//     puts("error checking ");
-//     for (int i = 0; i < length_counts.cnts[rank]; i++) {
-//       if (locallistA[i].length > 0) {
-//         for (int j = 0; j < locallistA[i].length; j++) {
-//           // printf("Here rank =%d\n", rank);
-//            printf("rank =%d i = %d globalID= %d \n",rank,i,
-//            locallistA[i].data[0]);
-//           // printf(" rank = %d  localListIndex=%d totallength = %d  data= %d
-//           // \n", rank, i , locallistA[i].length, locallistA[i].data[j]);
-//         }
-//       } else {
-//         printf("rank =%d  i = %d  ID =NULL \n",rank, i);
-//       }
-//     }
-//   }
-
-//   */
-//   Matrix X;
-//   X.rows = TOTALPAPERS;
-//   X.cols = 1;
-//   X.data = malloc(sizeof(double) * X.rows * X.cols);
-//   for (int i = 0; i < TOTALPAPERS; i++) {
-//     X.data[i] = 1;
-//   }
-
-//   // sending matrix lengths into the power method
-//   double e = 10E-16;
-//   // newpowermethod(locallistA, X, length_counts.cnts[rank], TOTALPAPERS, 5, e);
-
-//   // puts("outside powermethod ");
-//   if (rank == ROOT) {
-//     for (int i =0 ; i < TOTALPAPERS ; i++){
-//     // printf("data=%f \n", pageRanks.data[i]);
-//     // printf("data=%f \n", X.data[i]);
-//     }
-//     // printf("data=%f \n", X.data[0]);
-//   }
+  // puts("outside powermethod ");
+  if (rank == ROOT) {
+    for (int i =0 ; i < TOTALPAPERS ; i++){
+    // printf("data=%f \n", pageRanks.data[i]);
+    // printf("data=%f \n", X.data[i]);
+    }
+    // printf("data=%f \n", X.data[0]);
+  }
 
 
 
