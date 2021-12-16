@@ -94,8 +94,6 @@ int main(int argc, char **argv) {
     return 1;
   }
 
- 
-
 
   // opens the citation file
   FILE *fp= NULL;
@@ -432,7 +430,9 @@ if (rank == ROOT) {
   X.rows = TOTALPAPERS;
   X.cols = 1;
   X.data = calloc(TOTALPAPERS, sizeof(double) * sizeof(Matrix));
-
+  for(int i =0; i< TOTALPAPERS ;i++){
+    X.data = 1; 
+  }
   // sending matrix lengths into the power method
   double e = 10E-16;
   newpowermethod(locallistA, X, length_counts.cnts[rank], TOTALPAPERS, 5, e);
